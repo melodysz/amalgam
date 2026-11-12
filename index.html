@@ -1,17 +1,20 @@
 <meta charset="utf-8">
-<title>Delusion Home Shopping Network</title>
+<title>AMALGAM SHOPPING NETWORK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Rubik+Wet+Paint&family=Shrikhand&family=Silkscreen:wght@400;700&display=swap">
 <style>
 /* ============================================================
-   DELUSION HOME SHOPPING NETWORK — lo-fi prototype, milestone 1
+   AMALGAM SHOPPING NETWORK — lo-fi prototype, milestone 1
    Deliberately tacky. Single "theme": the catalogue.
    ============================================================ */
 :root{
   color-scheme: light;
+  /* big-screen scaling: the page is zoomed by --z (set by the script below), and
+     --uvw/--uvh are 1vw/1vh with that zoom divided back out, so full-screen things stay full-screen */
+  --z:1; --uvw:calc(1vw / var(--z)); --uvh:calc(1vh / var(--z));
   --yolk:#FFD21F;      /* catalogue yellow */
   --yolk-deep:#F5A800;
-  --royal:#1B2FBF;     /* Delusion wordmark blue */
+  --royal:#1B2FBF;     /* wordmark blue */
   --meat:#C8102E;      /* oath red */
   --liver:#5E0716;
   --gum:#FF4FA3;       /* hot pink */
@@ -28,16 +31,22 @@
   --catalogue:"Times New Roman", Times, serif;
   --hangul:"Black Han Sans", "Apple SD Gothic Neo", sans-serif;
   --drip:"Rubik Wet Paint", "Shrikhand", cursive;
+  /* old pixel cursors (same as assets/cursor-arrow.png / cursor-hand.png, inlined so the sign-in pop-up window gets them too) */
+  --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAAAa0lEQVR42uXXsQoAIAgEUP//p2upJSrKPD3pwFEeTqqISGkFixsAg3yAHgTkCyCgGMASigUsIA7gBeICNBAncANxAydQDmAHcQKTVbuqYMBiIcUA46h5gEljEuCgQQ25AbADDQ78c8NyfkQVozYPOC/55EMAAAAASUVORK5CYII=") 0 0, default;
+  --hand:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAmCAYAAAClI5npAAAAbElEQVR42u3WwQoAEBAEUP//05SjwqYxBjO1N7WvzUpK8eSm6DkGqA3bMCEGGGCAPGD7A6UNYMDuBARgeoDeAShgtMbHAKGRoaMPmI30KcDSZXsSMIQYwGgsA9gK+RcA+wcwAVCIAfcDgKUFKG5Ek93I10eTAAAAAElFTkSuQmCC") 11 0, pointer;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%; overscroll-behavior:none} /* no rubber-band bounce past the top/bottom */
+html{cursor:var(--arrow)}
+a{cursor:var(--hand)}
+input, textarea{cursor:text}
 body{
   margin:0; background:var(--yolk); color:var(--ink);
   font:16px/1.4 var(--catalogue);
   overflow-x:hidden;
 }
 img{max-width:100%; display:block}
-button{font:inherit; cursor:pointer}
+button{font:inherit; cursor:var(--hand)}
 :focus-visible{outline:3px dashed var(--gum); outline-offset:3px}
 a{color:var(--royal)}
 @media (prefers-reduced-motion: reduce){
@@ -81,14 +90,14 @@ a{color:var(--royal)}
 
 /* ==================== 01  OATH / PORTAL ==================== */
 #oath{position:fixed; inset:0; overflow:hidden; display:grid; place-items:center; z-index:50}
-#oath .jaw{position:absolute; left:50%; width:min(92vw,980px); transform:translateX(-50%); z-index:4;
+#oath .jaw{position:absolute; left:50%; width:min(calc(92*var(--uvw)),980px); transform:translateX(-50%); z-index:4;
   transition:transform .55s cubic-bezier(.7,-0.4,.3,1.4); filter:drop-shadow(0 12px 18px rgba(60,0,0,.45))}
-#oath .jaw.up{top:-6vh}
-#oath .jaw.down{bottom:-8vh}
-#oath.chomp .jaw.up{transform:translate(-50%,44vh)}
-#oath.chomp .jaw.down{transform:translate(-50%,-44vh)}
+#oath .jaw.up{top:calc(-6*var(--uvh))}
+#oath .jaw.down{bottom:calc(-8*var(--uvh))}
+#oath.chomp .jaw.up{transform:translate(-50%,calc(44*var(--uvh)))}
+#oath.chomp .jaw.down{transform:translate(-50%,calc(-44*var(--uvh)))}
 #oath.chomp .plate-wrap{transform:scale(.6) rotate(-8deg); opacity:.4}
-#oath .plate-wrap{position:relative; width:min(88vw,720px); aspect-ratio:808/599; display:grid; place-items:center;
+#oath .plate-wrap{position:relative; width:min(calc(88*var(--uvw)),720px); aspect-ratio:808/599; display:grid; place-items:center;
   transition:transform .5s, opacity .5s; z-index:2}
 #oath .lace-red{position:absolute; inset:0; width:100%; height:100%}
 #oath .plate{position:relative; width:62%; aspect-ratio:1; border-radius:50%;
@@ -97,23 +106,32 @@ a{color:var(--royal)}
     radial-gradient(circle, #8f0b1f 0 55%, #5a0514 56% 58%, #a3122a 59% 76%, #6b0818 77% 79%, #b8172f 80% 100%);
   box-shadow:0 16px 30px rgba(0,0,0,.5), inset 0 0 0 3px rgba(255,255,255,.12);
   display:grid; place-items:center; text-align:center; color:#fff;
-  font:clamp(10px,1.45vw,15px)/1.45 var(--catalogue);
+  font:clamp(10px,calc(1.45*var(--uvw)),15px)/1.45 var(--catalogue);
 }
 #oath .plate p{margin:0; padding:0 22%}
 #oath .needle{position:absolute; width:28%; right:6%; bottom:-6%; transform:rotate(-14deg); z-index:3}
-#oath .intro{position:absolute; top:clamp(110px,22vh,190px); left:0; right:0; z-index:5; text-align:center; padding-inline:16px;
-  color:#fff; font:clamp(18px,2.4vw,28px)/1.25 var(--catalogue); text-shadow:2px 2px 0 var(--ink)}
+#oath .intro{position:absolute; top:clamp(110px,calc(22*var(--uvh)),190px); left:0; right:0; z-index:5; text-align:center; padding-inline:16px;
+  color:#fff; font:clamp(18px,calc(2.4*var(--uvw)),28px)/1.25 var(--catalogue); text-shadow:2px 2px 0 var(--ink)}
 #oath .intro b{font:1.5em var(--catalogue); font-weight:400}
-#oath .swear{position:absolute; bottom:clamp(120px,21vh,200px); z-index:6; display:grid; justify-items:center; gap:10px; padding-inline:16px}
+#oath .swear{position:absolute; bottom:clamp(120px,calc(21*var(--uvh)),200px); z-index:6; display:grid; justify-items:center; gap:10px; padding-inline:16px}
 #hold{position:relative; overflow:hidden; border:3px solid var(--ink); border-radius:999px; padding:14px 30px;
   background:var(--yolk); font:18px var(--sign); color:var(--ink); box-shadow:5px 5px 0 var(--ink); user-select:none; -webkit-user-select:none; touch-action:none}
 #hold .fill{position:absolute; inset:0; width:0; background:var(--gum); mix-blend-mode:multiply}
 #hold span{position:relative}
 #oath .tiny{font:12px var(--bot); color:#ffd6de; text-align:center; max-width:36ch}
-#oath .fingerprint{position:absolute; right:4vw; bottom:4vh; z-index:6; width:58px; height:74px; border-radius:50% 50% 46% 46%;
+#oath .fingerprint{position:absolute; right:calc(4*var(--uvw)); bottom:calc(4*var(--uvh)); z-index:6; width:58px; height:74px; border-radius:50% 50% 46% 46%;
   background:repeating-radial-gradient(ellipse at 50% 60%, transparent 0 3px, #fff 3px 5px); opacity:.85}
 #oath .flash{position:absolute; inset:0; background:var(--liver); opacity:0; pointer-events:none; z-index:10; transition:opacity .35s}
 #oath.chomp .flash{opacity:1; transition-delay:.45s}
+/* Opening: the intro line types in word by word on black, then flies up into place as the black dissolves */
+#oath .curtain{position:absolute; inset:0; z-index:8; background:#000; transition:opacity 1.3s ease 1.8s, filter 1.3s ease 1.8s}
+#oath.typing .intro{z-index:9}
+#oath .intro .w{opacity:0}
+#oath .intro .w.on{opacity:1; animation:wordIn .18s ease-out}
+@keyframes wordIn{from{opacity:0; filter:blur(3px)}}
+#oath .intro .line{display:block; transition:transform .9s cubic-bezier(.55,0,.75,.25), opacity .7s ease, filter .7s ease}
+#oath .intro.fly .line{opacity:0; filter:blur(8px)}
+#oath.revealed .curtain{opacity:0; filter:blur(8px); pointer-events:none}
 
 /* ==================== SHOP SHELL ==================== */
 #shop{position:relative}
@@ -141,9 +159,9 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 
 /* hero */
 .hero{position:relative; display:grid; grid-template-columns:1.25fr 1fr; gap:16px; padding:28px 16px 18px; max-width:1400px; margin:0 auto; align-items:end}
-.hero h1{margin:0; font:clamp(44px,7vw,104px)/.88 var(--display); color:var(--royal); -webkit-text-stroke:2px var(--ink);
+.hero h1{margin:0; font:clamp(44px,calc(7*var(--uvw)),104px)/.88 var(--display); color:var(--royal); -webkit-text-stroke:2px var(--ink);
   text-shadow:5px 5px 0 #fff, 9px 9px 0 var(--ink); text-wrap:balance}
-.hero h1 em{font:italic clamp(40px,6vw,92px)/.9 var(--catalogue); color:var(--meat); -webkit-text-stroke:0; text-shadow:3px 3px 0 #fff}
+.hero h1 em{font:italic clamp(40px,calc(6*var(--uvw)),92px)/.9 var(--catalogue); color:var(--meat); -webkit-text-stroke:0; text-shadow:3px 3px 0 #fff}
 .hero .collab{font:italic 18px/1.5 var(--catalogue); color:var(--meat); margin:18px 0 0; padding:0; list-style:none}
 .hero .collab li::before{content:"★ "}
 .hero .mascot{position:relative; justify-self:center; width:min(100%,460px)}
@@ -156,7 +174,7 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .promo{position:relative; overflow:hidden; background:var(--royal); border-block:6px solid var(--ink); padding-block:18px}
 .promo .strip{display:flex; gap:18px; width:max-content; animation:slide 60s linear infinite}
 .promo:hover .strip{animation-play-state:paused}
-.promo img{height:340px; width:auto; border:4px solid #fff; box-shadow:6px 6px 0 var(--ink); transform:rotate(var(--r)); cursor:pointer}
+.promo img{height:340px; width:auto; border:4px solid #fff; box-shadow:6px 6px 0 var(--ink); transform:rotate(var(--r)); cursor:var(--hand)}
 @keyframes slide{to{transform:translateX(-50%)}}
 .promo .tag{position:absolute; left:16px; top:10px; z-index:2; background:var(--yolk); border:2px solid var(--ink); font:12px var(--sign); padding:3px 8px}
 
@@ -168,16 +186,16 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 
 .wrap{max-width:1400px; margin:0 auto; padding-inline:16px}
 .section-title{display:flex; align-items:end; gap:16px; flex-wrap:wrap; margin:44px 0 16px}
-.section-title h2{margin:0; font:clamp(34px,4.5vw,60px)/.95 var(--display); color:var(--meat); text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
+.section-title h2{margin:0; font:clamp(34px,calc(4.5*var(--uvw)),60px)/.95 var(--display); color:var(--meat); text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
 .section-title p{margin:0; font:italic 18px var(--catalogue); max-width:46ch}
 
 /* ---------- FRESH CUTS: meat trays ---------- */
 .cuts{background:var(--sky); border-block:5px solid var(--ink); padding-block:8px 36px; margin-top:40px;
   background-image:linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px);
   background-size:28px 28px}
-.cuts h2{color:var(--royal)!important; font-family:var(--drip)!important; font-size:clamp(40px,5.5vw,76px)!important}
+.cuts h2{color:var(--royal)!important; font-family:var(--drip)!important; font-size:clamp(40px,calc(5.5*var(--uvw)),76px)!important}
 .trays{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:26px}
-.tray{position:relative; aspect-ratio:4/3; border-radius:22px; cursor:pointer;
+.tray{position:relative; aspect-ratio:4/3; border-radius:22px; cursor:var(--hand);
   background:
     radial-gradient(ellipse at 50% 55%, #fffdf6 0 55%, #ece6d6 70%, #d9d2bf 100%);
   box-shadow:0 10px 0 #cfc7b2, 0 14px 22px rgba(0,0,0,.25); transition:transform .15s}
@@ -200,9 +218,17 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 
 /* ---------- PRODUCT GRID ---------- */
 .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px}
-.card{position:relative; border:3px solid var(--ink); background:var(--card,#fff); padding:12px; cursor:pointer; text-align:left;
+.card{position:relative; border:3px solid var(--ink); background:var(--card,#fff); padding:12px; cursor:var(--hand); text-align:left;
   box-shadow:6px 6px 0 var(--ink); transform:rotate(var(--r,0deg)); transition:transform .12s, box-shadow .12s; display:flex; flex-direction:column; gap:8px}
 .card:hover{transform:rotate(0) translate(-3px,-3px); box-shadow:10px 10px 0 var(--ink)}
+/* now and then a card shakes for attention (see nudgeCards); uses translate/rotate so it stacks on the card's own tilt */
+.card.nudge{animation:nudge .7s linear}
+@keyframes nudge{
+  0%,100%{translate:0 0; rotate:0deg}
+  10%{translate:-4px 1px; rotate:-3deg} 20%{translate:4px -2px; rotate:3deg} 30%{translate:-5px 0; rotate:-4deg}
+  40%{translate:5px 1px; rotate:4deg} 50%{translate:-3px -1px; rotate:-2deg} 60%{translate:3px 1px; rotate:2deg}
+  70%{translate:-2px 0; rotate:-1deg} 80%{translate:1px 0; rotate:1deg}
+}
 .card .ph{aspect-ratio:1; display:grid; place-items:center; background:var(--ph,#fff6); overflow:hidden; position:relative}
 .card .ph img{max-height:92%; object-fit:contain}
 .card .letter{position:absolute; left:8px; top:8px; width:28px; height:34px; border-radius:50%; border:1.5px solid var(--meat); background:var(--yolk);
@@ -238,7 +264,7 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 /* ---------- vision exam ---------- */
 .exam{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; margin-top:40px; background:var(--paper); border:3px solid var(--ink); padding:20px; box-shadow:8px 8px 0 var(--royal)}
 .exam svg{width:100%; height:auto; border:3px solid var(--ink); border-radius:50% / 30%; background:#9fd8ff}
-.exam h2{font:clamp(28px,3.5vw,44px)/1 var(--sign); color:var(--royal); margin:0 0 10px}
+.exam h2{font:clamp(28px,calc(3.5*var(--uvw)),44px)/1 var(--sign); color:var(--royal); margin:0 0 10px}
 .exam p{font:18px/1.45 var(--catalogue); margin:0 0 10px}
 #walker{transform-box:fill-box; transform-origin:50% 100%; animation:approach 140s linear forwards}
 @keyframes approach{0%{transform:scale(1)}90%{transform:scale(9)}100%{transform:scale(40)}}
@@ -266,7 +292,7 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .faq{margin-top:40px; background:var(--slime); border:4px solid var(--ink); padding:18px; box-shadow:8px 8px 0 var(--moss)}
 .faq h2{margin:0 0 10px; font:44px var(--display); color:#fff; -webkit-text-stroke:1.5px var(--ink)}
 .faq details{background:#fff; border:2px solid var(--ink); margin-top:8px; padding:10px 14px}
-.faq summary{font:16px var(--sign); cursor:pointer}
+.faq summary{font:16px var(--sign); cursor:var(--hand)}
 .faq details p{font:17px/1.45 var(--catalogue); margin:8px 0 2px}
 
 /* footer, neocities-ish */
@@ -281,7 +307,7 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 .whisper{font:9px var(--bot); color:#2a3fd6; word-break:break-all; margin-top:18px; user-select:all}
 
 /* ---------- popups ---------- */
-.pop{position:fixed; z-index:60; width:min(320px,86vw); background:#ece9d8; border:2px solid #0a246a; box-shadow:6px 6px 0 rgba(0,0,0,.4); font:14px var(--catalogue)}
+.pop{position:fixed; z-index:60; width:min(320px,calc(86*var(--uvw))); background:#ece9d8; border:2px solid #0a246a; box-shadow:6px 6px 0 rgba(0,0,0,.4); font:14px var(--catalogue)}
 .pop .bar{background:linear-gradient(90deg,#0a246a,#a6caf0); color:#fff; font:12px var(--bot); padding:4px 6px; display:flex; justify-content:space-between; align-items:center}
 .pop .bar button{background:#d4d0c8; border:1px outset #fff; font:11px/1 var(--cheap); width:20px; height:18px; padding:0}
 .pop .body{padding:12px; display:grid; gap:8px; text-align:center}
@@ -293,7 +319,7 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 .ssowin .chrome{background:#e8e6e3; padding:8px 10px; display:flex; gap:8px; align-items:center; user-select:none}
 .ssowin .lights{display:flex; gap:6px}
 .ssowin .lights i{width:12px; height:12px; border-radius:50%; background:#ccc; display:block}
-.ssowin .lights i:first-child{background:#ff5f57; cursor:pointer}
+.ssowin .lights i:first-child{background:#ff5f57; cursor:var(--hand)}
 .ssowin .lights i:nth-child(2){background:#febc2e}
 .ssowin .lights i:nth-child(3){background:#28c840}
 .ssowin .url{flex:1; background:#fff; border-radius:6px; font:12px system-ui, sans-serif; color:#555; padding:4px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
@@ -306,7 +332,7 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 #bot-tab{position:fixed; right:16px; bottom:16px; z-index:55; display:flex; align-items:center; gap:8px; background:#8b3dff; color:#fff; border:3px solid var(--ink);
   border-radius:999px; padding:6px 14px 6px 8px; font:600 14px Arial, Helvetica, sans-serif; box-shadow:4px 4px 0 var(--ink)}
 #bot-tab img{width:44px}
-#bot{position:fixed; right:16px; bottom:84px; z-index:56; width:min(360px,calc(100vw - 32px)); height:min(500px,70vh); display:flex; flex-direction:column;
+#bot{position:fixed; right:16px; bottom:84px; z-index:56; width:min(360px,calc(calc(100*var(--uvw)) - 32px)); height:min(500px,calc(70*var(--uvh))); display:flex; flex-direction:column;
   background:#fff; border:3px solid var(--ink); box-shadow:8px 8px 0 var(--gum); color:var(--ink); font-family:Arial, Helvetica, sans-serif}
 #bot header{display:flex; align-items:center; gap:8px; padding:8px 10px; background:#8b3dff; color:#fff; font:700 14px Arial, Helvetica, sans-serif}
 #bot header small{display:block; font-weight:400; font-size:11px; opacity:.85}
@@ -317,7 +343,7 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 .msg.ai b{color:var(--royal)}
 .msg.ai i{color:var(--meat); font-style:normal}
 .msg.ai .fb{display:block; margin-top:6px; font-size:11px; color:#888}
-.msg.ai .fb u{cursor:pointer}
+.msg.ai .fb u{cursor:var(--hand)}
 .msg.me{background:var(--yolk); align-self:flex-end; border:1px solid var(--ink); border-bottom-right-radius:2px}
 .msg.typing{color:#999; font-style:italic}
 #bot form{display:flex; border-top:2px solid var(--ink)}
@@ -329,15 +355,15 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 
 /* ==================== 04½  UPSELL GAUNTLET ==================== */
 #upsell{padding-block:20px 190px}
-.ups-head h1{font:clamp(34px,4.5vw,60px)/1 var(--display); color:var(--meat); margin:6px 0 0; text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
+.ups-head h1{font:clamp(34px,calc(4.5*var(--uvw)),60px)/1 var(--display); color:var(--meat); margin:6px 0 0; text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
 .ups-sure{display:flex; flex-wrap:wrap; gap:2px 14px; margin:12px 0 6px; font-family:var(--sign); color:var(--royal); line-height:1.15}
 .ups-sure span{display:inline-block; transform:rotate(var(--r))}
-.ups-line{font:italic clamp(22px,2.4vw,32px)/1.3 var(--catalogue); margin:10px 0 0; min-height:1.3em}
+.ups-line{font:italic clamp(22px,calc(2.4*var(--uvw)),32px)/1.3 var(--catalogue); margin:10px 0 0; min-height:1.3em}
 .ups .card{cursor:default}
 .ups .card .btn{font-size:14px; padding:8px 12px; box-shadow:3px 3px 0 var(--ink)}
 .notsure{background:none; border:0; padding:0; font:13px var(--bot); color:#666; text-decoration:underline}
 .gauntlet-bar{position:fixed; left:50%; bottom:calc(16px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); z-index:67;
-  width:min(560px,calc(100vw - 32px)); background:var(--paper); border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink); padding:10px 12px; display:grid; gap:8px}
+  width:min(560px,calc(calc(100*var(--uvw)) - 32px)); background:var(--paper); border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink); padding:10px 12px; display:grid; gap:8px}
 body:not(.gauntlet) .gauntlet-bar{display:none}
 body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .meter .txt{display:flex; justify-content:space-between; font:12px var(--sign); font-variant-numeric:tabular-nums}
@@ -348,7 +374,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 #proceed{width:100%; font-size:22px; user-select:none; -webkit-user-select:none}
 /* the face */
 #scare{position:fixed; inset:0; z-index:66; background:#000; display:grid; place-items:center; overflow:hidden; cursor:none}
-#scare svg{width:min(96vw,108vh); height:auto; animation:scare-in .09s steps(2), jitter .14s steps(2) infinite}
+#scare svg{width:min(calc(96*var(--uvw)),calc(108*var(--uvh))); height:auto; animation:scare-in .09s steps(2), jitter .14s steps(2) infinite}
 #scare .grain{position:absolute; inset:-50%; pointer-events:none; opacity:.22;
   background-image:radial-gradient(rgba(255,255,255,.5) 1px, transparent 1.5px); background-size:5px 7px; animation:grain .18s steps(3) infinite}
 @keyframes scare-in{from{transform:scale(1.7); filter:brightness(4) contrast(2)}}
@@ -361,7 +387,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .pdp .stage .lace{position:absolute; inset:2%; width:96%; height:96%; object-fit:contain; opacity:.95}
 .pdp .stage .hero-img{position:relative; max-width:48%; max-height:48%; object-fit:contain; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,.4))}
 .pdp .stage .pend{z-index:2; width:44%}
-.pdp h1{margin:0; font:clamp(40px,5vw,72px)/.95 var(--display); color:var(--royal); -webkit-text-stroke:1.5px var(--ink); text-shadow:4px 4px 0 #fff}
+.pdp h1{margin:0; font:clamp(40px,calc(5*var(--uvw)),72px)/.95 var(--display); color:var(--royal); -webkit-text-stroke:1.5px var(--ink); text-shadow:4px 4px 0 #fff}
 .pdp .tagline{font:italic 22px var(--catalogue); color:var(--meat); margin:8px 0 14px}
 .pdp .prices{display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; font-size:52px}
 .pdp .stock{font:14px var(--bot); color:var(--meat); animation:blink 1s steps(1) infinite}
@@ -431,15 +457,15 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .side-ad img{border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink)}
 
 /* ==================== 06  CONFIRMATION ==================== */
-#confirm-screen{background:#1d2a9e; color:#fff; min-height:100vh; padding:30px 16px; text-align:center; position:relative; overflow:hidden}
-#confirm-screen .smile{width:min(360px,80vw); margin:0 auto; border:5px solid #fff}
-#confirm-screen h1{font:clamp(34px,5vw,64px)/1 var(--display); color:var(--yolk); margin:22px 0 8px; text-shadow:4px 4px 0 var(--ink)}
+#confirm-screen{background:#1d2a9e; color:#fff; min-height:calc(100*var(--uvh)); padding:30px 16px; text-align:center; position:relative; overflow:hidden}
+#confirm-screen .smile{width:min(360px,calc(80*var(--uvw))); margin:0 auto; border:5px solid #fff}
+#confirm-screen h1{font:clamp(34px,calc(5*var(--uvw)),64px)/1 var(--display); color:var(--yolk); margin:22px 0 8px; text-shadow:4px 4px 0 var(--ink)}
 #confirm-screen p{font:20px/1.45 var(--catalogue); max-width:56ch; margin:8px auto}
 .rocket{position:absolute; left:-120px; bottom:20%; font:40px var(--sign); color:var(--yolk); white-space:nowrap; animation:rocket 7s linear infinite}
 .rocket .ship{display:inline-block; width:90px; height:34px; background:linear-gradient(#fff,#bbb); border-radius:50% 70% 70% 50% / 50%; position:relative; vertical-align:middle; border:2px solid var(--ink)}
 .rocket .ship::before{content:""; position:absolute; left:-30px; top:6px; width:30px; height:18px; background:linear-gradient(90deg,transparent,var(--meat),var(--yolk)); border-radius:50%}
 .rocket .ship::after{content:""; position:absolute; right:16px; top:9px; width:12px; height:12px; border-radius:50%; background:var(--sky); border:2px solid var(--ink)}
-@keyframes rocket{0%{transform:translate(0,0) rotate(-8deg)}100%{transform:translate(calc(100vw + 260px),-50vh) rotate(-22deg)}}
+@keyframes rocket{0%{transform:translate(0,0) rotate(-8deg)}100%{transform:translate(calc(calc(100*var(--uvw)) + 260px),calc(-50*var(--uvh))) rotate(-22deg)}}
 
 /* fake inbox */
 .inbox{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px}
@@ -458,7 +484,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .vwin .b{padding:10px}
 .vwin .prog{height:16px; border:2px inset #fff; background:#fff; margin-top:6px}
 .vwin .prog i{display:block; height:100%; width:var(--p,0%); background:repeating-linear-gradient(90deg,#000080 0 10px,#fff 10px 12px)}
-#virus .final{position:absolute; inset:0; display:grid; place-items:center; text-align:center; color:var(--yolk); font:clamp(28px,5vw,64px)/1.05 var(--display); padding:16px; z-index:5; background:var(--meat)}
+#virus .final{position:absolute; inset:0; display:grid; place-items:center; text-align:center; color:var(--yolk); font:clamp(28px,calc(5*var(--uvw)),64px)/1.05 var(--display); padding:16px; z-index:5; background:var(--meat)}
 #virus .final small{display:block; font:16px var(--bot); color:#fff; margin-top:16px}
 
 /* ---------- responsive ---------- */
@@ -469,6 +495,17 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
   .selfie{grid-template-columns:120px 1fr}
 }
 </style>
+<script>
+// Big screens (the exhibition iMac): scale the whole shop up so it fills the screen like it does on a laptop.
+// Designed at about 1600×900 (laptops stay at 100%); never shrinks below 1.
+(function scaleToScreen(){
+  const fit = () => {
+    const z = Math.max(1, Math.min(innerWidth / 1600, innerHeight / 900, 1.8));
+    const r = document.documentElement; r.style.zoom = z.toFixed(3); r.style.setProperty("--z", z.toFixed(3));
+  };
+  fit(); addEventListener("resize", fit);
+})();
+</script>
 
 <!-- ======================= 01 · OATH ======================= -->
 <section id="oath" class="screen sparkle-bg" aria-label="Customer oath">
@@ -511,7 +548,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
   <main id="home" class="view">
     <section class="hero">
       <div>
-        <h1>Delusion Home <em>Shopping</em> Network</h1>
+        <h1>AMALGAM <em>Shopping</em> Network</h1>
         <ul class="collab">
           <li>in splendid collaboration with the Space Shopping Mall!</li>
           <li>Looky Mart™</li>
@@ -544,7 +581,8 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
       <div class="section-title" id="products"><h2>Everyday Goodies</h2><p>★ Rest assured! Everything on this website is 100% INORGANICALLY PRODUCED, 300/300 UNETHICALLY SOURCED!</p></div>
       <div class="grid" id="grid"></div>
 
-      <section class="exam" aria-label="Complimentary vision screening">
+      <!-- hidden for now (2026-11-12); delete the style="display:none" to bring it back -->
+      <section class="exam" aria-label="Complimentary vision screening" style="display:none">
         <svg viewBox="0 0 400 260" role="img" aria-label="A hot-air balloon over a road to the horizon">
           <defs><linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fc3ff"/><stop offset="1" stop-color="#d9f1ff"/></linearGradient></defs>
           <rect width="400" height="160" fill="url(#skyg)"/>
@@ -675,7 +713,15 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 </div>
 
 <!-- TESTING ONLY — delete this button when done -->
-<button id="test-sso" type="button" style="position:fixed;right:12px;bottom:12px;z-index:999;font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:pointer">TEST POP-UP</button>
+<button id="test-sso" type="button" style="position:fixed;right:12px;bottom:12px;z-index:999;font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">TEST POP-UP</button>
+<button id="dev-skip" type="button" style="position:fixed;left:12px;bottom:12px;z-index:999;font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">SKIP TO SHOP (DEV)</button>
+<div id="dev-music" style="position:fixed;left:12px;bottom:56px;z-index:999;display:flex;align-items:center;gap:6px">
+  <button id="dev-mute" type="button" style="font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">MUTE MUSIC (DEV)</button>
+  <button id="dev-prev" type="button" aria-label="Previous track" style="font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">◀</button>
+  <button id="dev-next" type="button" aria-label="Next track" style="font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">▶</button>
+  <button id="dev-glitch" type="button" style="font:13px var(--sign);padding:8px 12px;background:var(--slime);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:var(--hand)">GLITCH</button>
+  <span id="dev-track" style="font:12px var(--bot);background:var(--ink);color:#fff;padding:6px 8px"></span>
+</div>
 <div id="inbox" class="inbox" hidden></div>
 <div id="virus" hidden></div>
 
@@ -683,23 +729,25 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 /* ============================================================
    DATA — edit products here. `img` = file in /assets, or `pend` = CSS stand-in
    ============================================================ */
-const BRAND = "AMALGAM"; // placeholder corporation name — swap freely
+const BRAND = "AMALGAM";
 
 const ITEMS = [
-  {id:"bathtub", name:"Blood Bathtub", price:29999999, was:31999999, pend:"tub", pendText:"5.5 L", tag:"An amazing elixir of youth!",
+  {id:"bathtub", name:"Blood Bathtub", price:29999999, was:31999999, img:"blood-bathtub.png", tag:"An amazing elixir of youth!",
    blurb:"The past is in the present.", desc:"For use, fill it up with at least 5.5 liters of blood from a sentient being of intelligence. ^^ Bring your own sentient being.", warn:"Do not drain into municipal pipes. The pipes remember.", card:"#ffe3ea"},
-  {id:"caterpillars", name:"Fat-Sucking Caterpillars", price:8999999, was:12999999, img:"i54095.png", tag:"Watch Your Fat Slide Clean Off!",
+  {id:"caterpillars", name:"Fat-Sucking Caterpillars", price:8999999, was:12999999, img:"caterpillar.png", tag:"Watch Your Fat Slide Clean Off!",
    blurb:"A diet supplement made by the devil!", desc:"It is truly a diet supplement made by the devil, a bug that eats fat: the Aesthetic Caterpillar Egg Cluster! Just take it with water after a meal, and that's it. If you buy now, at this record-breaking special price, we'll even send you a single Happy Maker as a free gift!", warn:"Caterpillars do not know when to stop.", card:"#e9ffe0"},
   {id:"bonbons", name:"Mind-Melting Bonbons", price:4999999, img:"i72729.png", tag:"Got memories you’d like to trash?",
    blurb:"Someone you’d like to keep?", desc:"One bonbon removes one memory of your choosing. Two bonbons remove one memory of OUR choosing. Individually wrapped for freshness.", warn:"May contain traces of your childhood.", card:"#fff0f7"},
   {id:"postit", name:"Unlucky Post-It", price:999999, pend:"postit", pendText:"you know what you did", tag:"A curse item.",
    blurb:"Sticky. Lightly cursed.", desc:"The user must know the target personally, and the target must discover and read the talisman directly. Stick it on a fridge, a monitor, a forehead.", warn:"Do not write your own name. People keep doing this.", card:"#fffbd0"},
-  {id:"teddy", name:"Happy Ending Teddy", price:19999999, pend:"teddy", pendText:"ʕ•ᴥ•ʔ", soldout:true, tag:"1999 LIMITED EDITION.",
+  {id:"teddy", name:"Happy Ending Teddy", price:19999999, img:"happy-ending-teddy.png", soldout:true, tag:"1999 LIMITED EDITION.",
    blurb:"It grants the Ending of Life! A peaceful slumber!", desc:"Soft, huggable, and stuffed with something warm. It grants the Ending of Life! A peaceful slumber!", warn:"Do not discard. Neglectful owners will be visited.", card:"#f5e6d6"},
   {id:"happymaker", name:"Happy Maker", price:27999999, pend:"pill", pendText:"HAPPY :)", tag:"Rapid pain elimination!",
    blurb:"For irreversible situations.", desc:"An item that causes rapid pain elimination! In times of irreversible situations, it can be used for euthanasia. Ask your doctor if Happy Maker is right for you. Your doctor is not available.", warn:"Do not operate heavy machinery, or a body.", card:"#e2f3ff"},
   {id:"bedroom", name:"Your Bedroom", price:13999999, was:14999999, img:"i9170.jpg", tag:"Does this look familiar?",
    blurb:"Select all images with NEW ITEM.", desc:"Full set: one bed, one wardrobe, one window you leave unlocked. Photographed in-situ for authenticity. 5~15% off if you are currently inside it.", warn:"Item is already at your address.", card:"#ffffff"},
+  {id:"goodfriend", name:"Good Friend", price:15999999, img:"good-friend.png", tag:"It’s your cute animal doll!",
+   blurb:"It will always be with you. Always. :)", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffe8f0"},
   {id:"modify", name:"Make Your Ideal Self Kit", price:34999999, img:"i33110.png", tag:"Modify!",
    blurb:"Yes, we literally stole these parts!", desc:"It’s simple! It’s a steal! Yes, we literally stole these body parts! Everything is 0% Ethically Sourced! Our special thanks~ to the University of California, Los Angeles~", warn:"Parts may not match. Parts may want to go home.", card:"#ffe8f3"},
   {id:"lunch", name:"Lunch For Your Child", price:2999999, img:"i2_8.png", tag:"Toys You Can Trust With Your Child! We Promise!",
@@ -733,6 +781,9 @@ const CUTS = [
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 const rand = (a,b) => a + Math.random()*(b-a);
+// screen size in page units (the page is zoomed up on big screens, see scaleToScreen)
+const zoom = () => parseFloat(document.documentElement.style.zoom) || 1;
+const viewW = () => innerWidth / zoom(), viewH = () => innerHeight / zoom();
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const won = n => {
   const s = n.toLocaleString("en-US"); const i = s.indexOf(",");
@@ -744,15 +795,25 @@ const store = {
 };
 let plate = store.get("plate", []);
 let customer = store.get("customer", null); // {name, selfie} once consumed
-const allItems = () => customer ? [youItem(), ...ITEMS] : ITEMS;
+const allItems = () => [...(customer ? [youItem()] : []), ...pastItems(), ...ITEMS];
+const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+// earlier customers saved on the kiosk computer (see kiosk archive below), listed back as products
+let pastCustomers = [];
+const PAST_SHOWN = 6;
+const pastItems = () => pastCustomers.filter(p => p.id !== customer?.invId).slice(0, PAST_SHOWN).map(p => {
+  const name = esc(p.name), day = new Date(p.ts).toLocaleDateString("en-US", {month:"short", day:"numeric"});
+  return {id:`inv-${p.id}`, name:`${name} (Pre-Owned)`, price:1, photo:p.files[p.pick], isPast:true, tag:"BACK IN STOCK.",
+    blurb:`Formerly a customer. Now in stock.`, desc:`Browsed this exact website. Checked out on ${day}. Was listed for sale moments later. Includes one (1) face, lightly used, and whatever they were hoping to buy.`,
+    warn:"No refunds. No returns. Especially no returns.", card:"#eef2f4"};
+});
 const youItem = () => {
   const v = customer.variants && customer.pick, meta = v ? VARIANTS[v] : {name:"It’s You!", tag:"NEW ARRIVAL!"};
   return youBase(meta, v ? customer.variants[v] : customer.selfie);
 };
 const youBase = (meta, selfie) => ({id:"you", name:meta.name, price:1, img:null, selfie, isYou:true, tag:meta.tag,
   blurb:`Freshly listed: ${customer.name || "a customer"}.`, desc:`A bipedal primate in its 20s (probably). Gently used. Includes one (1) email address, one (1) blood type, and all past injuries. Recently purchased something on this website.`, warn:"This item is already in your cart. This item is the cart.", card:"var(--gum)"});
-const imgFor = (it, cls="") => it.isYou
-  ? `<img class="${cls}" src="${it.selfie}" alt="You" style="border:4px solid #fff;aspect-ratio:1;object-fit:cover;box-shadow:4px 4px 0 var(--ink)">`
+const imgFor = (it, cls="") => it.isYou || it.isPast
+  ? `<img class="${cls}" src="${it.selfie || it.photo}" alt="${it.isYou ? "You" : it.name}" style="border:4px solid #fff;aspect-ratio:1;object-fit:cover;box-shadow:4px 4px 0 var(--ink)">`
   : it.img ? `<img class="${cls}" src="assets/${it.img}" alt="${it.name}">`
   : `<div class="pend ${it.pend}">${it.pendText || ""}<span class="tapes">PHOTO BEING HARVESTED</span></div>`;
 
@@ -766,12 +827,13 @@ const imgFor = (it, cls="") => it.isYou
     const p = Math.min(1, (now - t0) / DUR);
     fill.style.width = (p*100) + "%";
     lab.textContent = lines[Math.min(lines.length-1, Math.floor(p*lines.length))];
-    if (p >= 1){ done = true; enter(); return; }
+    if (p >= 1){ done = true; sfx.holdStop(); enter(); return; }
     raf = requestAnimationFrame(tick);
   };
-  const start = e => { if (done) return; e.preventDefault(); t0 = performance.now(); raf = requestAnimationFrame(tick); };
+  const start = e => { if (done) return; e.preventDefault(); t0 = performance.now(); raf = requestAnimationFrame(tick); sfx.holdStart(DUR); };
   const stop = () => {
     if (done) return; cancelAnimationFrame(raf); fill.style.width = "0";
+    if (sfx.holdStop()) sfx.nope(); // let go too early
     lab.textContent = "PRESS & HOLD TO SWEAR";
     tiny.textContent = pick(["Are promises broken so easily?","You let go. We noticed.","Again. From the top. With feeling.","Every. Last. Drop."]);
   };
@@ -779,9 +841,59 @@ const imgFor = (it, cls="") => it.isYou
   ["pointerup","pointerleave","pointercancel"].forEach(ev => btn.addEventListener(ev, stop));
   btn.addEventListener("keydown", e => { if ((e.key===" "||e.key==="Enter") && !e.repeat) start(e) });
   btn.addEventListener("keyup", e => { if (e.key===" "||e.key==="Enter") stop() });
+  // Opening: black screen, the intro line types in word by word in the middle, then flies up off the top and
+  // dissolves while the black dissolves away
+  (function opening(){
+    const oathEl = $("#oath"), intro = $(".intro", oathEl);
+    if (oathEl.hidden || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // wrap each word (keeping the big <b>V</b> attached to "alued" and the line breaks where they are)
+    const words = [];
+    let cur = null;
+    const flush = () => { cur = null; };
+    const word = () => { if (!cur){ cur = document.createElement("span"); cur.className = "w"; words.push(cur); } return cur; };
+    // each <br>-separated line gets its own span so the lines can fly off one after another
+    const out = document.createDocumentFragment(), lines = [];
+    let line;
+    const newLine = () => { line = document.createElement("span"); line.className = "line"; lines.push(line); out.append(line); };
+    newLine();
+    for (const node of [...intro.childNodes]){
+      if (node.nodeType === 3){
+        node.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)){ flush(); line.append(part); return; }
+          const w = word(); if (!w.parentNode) line.append(w); w.append(part);
+        });
+      } else if (node.nodeName === "BR"){ flush(); newLine(); }
+      else { const w = word(); if (!w.parentNode) line.append(w); w.append(node); }
+    }
+    intro.replaceChildren(out);
+    const curtain = document.createElement("div");
+    curtain.className = "curtain";
+    oathEl.append(curtain);
+    oathEl.classList.add("typing");
+    // start in the middle of the screen
+    const r = intro.getBoundingClientRect();
+    intro.style.transform = `translateY(${Math.round((innerHeight / 2 - (r.top + r.height / 2)) / zoom())}px)`;
+    let i = 0;
+    const next = () => {
+      if (i < words.length){ words[i++].classList.add("on"); setTimeout(next, 110 + Math.random() * 120); return; }
+      setTimeout(() => {
+        // top line leaves first; each line goes just far enough to clear the top edge
+        lines.forEach((ln, k) => {
+          const d = k * 0.14;
+          ln.style.transitionDelay = `${d}s, ${d + 0.15}s, ${d + 0.15}s`;
+          ln.style.transform = `translateY(${-Math.round((ln.getBoundingClientRect().bottom + 40) / zoom())}px)`;
+        });
+        intro.classList.add("fly");
+        oathEl.classList.add("revealed");
+        setTimeout(() => { curtain.remove(); intro.hidden = true; oathEl.classList.remove("typing", "revealed"); }, 3300);
+      }, 650);
+    };
+    setTimeout(next, 700);
+  })();
   function enter(){
-    $("#oath").classList.add("chomp");
-    setTimeout(() => { $("#oath").hidden = true; $("#shop").hidden = false; store.set("sworn", true); go("home"); startAnnoyances(); }, 1100);
+    $("#oath").classList.add("chomp"); sfx.chomp();
+    setTimeout(() => { $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; startMusic(); store.set("sworn", true); go("home"); startAnnoyances(); }, 1100);
   }
 })();
 
@@ -808,7 +920,7 @@ const updateCount = () => $("#plate-count").textContent = plate.length;
 function renderHome(){
   $("#grid").innerHTML = allItems().map((it,i) => `
     <button class="card ${it.soldout?"soldout":""} ${it.isYou?"you":""}" data-go="item" data-arg="${it.id}" style="--r:${(i%3-1)*1.2}deg;--card:${it.card}">
-      ${it.isYou ? `<span class="burst flag wiggle" style="--c:var(--yolk);color:var(--meat)">NEW!! JUST LISTED</span>` : i%5===1 ? `<span class="burst flag" style="--c:var(--meat)">GREAT VALUE</span>` : ""}
+      ${it.isYou ? `<span class="burst flag wiggle" style="--c:var(--yolk);color:var(--meat)">NEW!! JUST LISTED</span>` : it.isPast ? `<span class="burst flag" style="--c:var(--sky)">BACK IN STOCK</span>` : i%5===1 ? `<span class="burst flag" style="--c:var(--meat)">GREAT VALUE</span>` : ""}
       <div class="ph halftone">${imgFor(it)}<span class="letter">${String.fromCharCode(65+i)}.</span></div>
       <h3>${it.name}</h3>
       <p class="blurb">${it.blurb}</p>
@@ -816,6 +928,22 @@ function renderHome(){
     </button>`).join("");
   updateCount();
 }
+
+// now and then one product card on screen shakes, as if trying to get your attention
+(function nudgeCards(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const tick = () => {
+    setTimeout(tick, rand(3500, 8000));
+    if (document.hidden) return;
+    const onScreen = $$("#grid .card, #item .grid .card").filter(c => {
+      const r = c.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && !c.matches(":hover");
+    });
+    const c = pick(onScreen); if (!c) return;
+    c.classList.remove("nudge"); void c.offsetWidth; c.classList.add("nudge"); // restart if it was mid-shake
+    c.addEventListener("animationend", function done(e){ if (e.animationName !== "nudge") return; c.classList.remove("nudge"); c.removeEventListener("animationend", done); });
+  };
+  setTimeout(tick, 4000);
+})();
 
 // tray section
 $("#trays").innerHTML = CUTS.map(c => `
@@ -885,7 +1013,8 @@ const STATUSES = ["This user is an omnivore.","This user has been consumed.","Th
   "This user is reading the reviews.","This user has been in the cart for 3 days.","This user is crying (happy).","This user has been consumed."];
 const custNames = ["guest_0411","u/hungryhungry","Customer #8","sekwang_survivor","guest_0412","anon","█████","LoveTeeth99","guest_0413","mom"];
 function renderCustomers(){
-  const rows = custNames.slice(0, 8).map(n => { const s = pick(STATUSES); return `<li class="${s.includes("consumed")?"gone":""}"><span class="dot"></span><span><b>${n}</b> — ${s}</span></li>` });
+  const real = pastCustomers.filter(p => p.id !== customer?.invId).slice(0, 3).map(p => esc(p.name));
+  const rows = [...real, ...custNames].slice(0, 8).map(n => { const s = real.includes(n) ? "This user is now in stock." : pick(STATUSES); return `<li class="${s.includes("consumed")?"gone":""}"><span class="dot"></span><span><b>${n}</b> — ${s}</span></li>` });
   rows.splice(2, 0, `<li class="me"><span class="dot" style="background:var(--yolk)"></span><span><b>YOU</b> — ${customer ? "This user has been listed." : "This user is being watched."}</span></li>`);
   $("#customers").innerHTML = rows.join("");
   $("#cust-n").textContent = Math.floor(rand(7, 12));
@@ -1048,7 +1177,7 @@ $("#proceed").addEventListener("click", () => {
   g.clicks = [...g.clicks, now].slice(-FAST_CLICKS);
   if (g.scaring) return toCheckout();
   const fast = g.clicks.length === FAST_CLICKS && g.clicks.slice(1).every((t, i) => t - g.clicks[i] < FAST_MS);
-  if (SETBACKS[g.step] && !g.turned[g.step]){ g.turned[g.step] = true; g.step -= SETBACKS[g.step]; }
+  if (SETBACKS[g.step] && !g.turned[g.step]){ g.turned[g.step] = true; g.step -= SETBACKS[g.step]; sfx.setback(); }
   else g.step++;
   if (g.step >= LINES.length) return toCheckout();
   if (fast && !g.scared){ g.scared = g.scaring = true; showScare(); return; }
@@ -1059,49 +1188,280 @@ function toCheckout(){ go("checkout"); }
 // the face
 function showScare(){
   $("#scare").hidden = false;
-  startBreathing();
+  pauseMusic(); startAlarm(); // the music cuts out dead for the alarm
   document.addEventListener("pointermove", eyesFollow);
 }
 function endScare(){
   if ($("#scare").hidden) return;
   $("#scare").hidden = true; g.scaring = false;
   document.removeEventListener("pointermove", eyesFollow);
-  stopBreathing(2.5); // let it linger into the next page
+  stopAlarm(2.5); // let it linger into the next page
+  setTimeout(resumeMusic, 2500);
 }
 function eyesFollow(e){
   const dx = (e.clientX / innerWidth - .5) * 16, dy = (e.clientY / innerHeight - .5) * 8;
   $$("#scare .pupil").forEach(p => { p.setAttribute("cx", +p.dataset.cx + dx); p.setAttribute("cy", 208 + dy); });
 }
 
-// heavy breathing, synthesized: filtered noise shaped into inhale / exhale
-let actx = null, breath = null;
+// emergency alert alarm, synthesized: three bursts of the digital header screech,
+// then the two-tone attention signal (853 Hz + 960 Hz) until the face goes away
+let actx = null, alarm = null;
 function unlockAudio(){
   try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); }catch(e){ actx = null; }
 }
-function startBreathing(){
-  if (!actx || breath) return;
-  const sr = actx.sampleRate, buf = actx.createBuffer(1, sr * 2, sr), d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-  const master = actx.createGain(); master.gain.value = 1; master.connect(actx.destination);
-  const puff = (at, dur, freq, peak) => {
-    const src = actx.createBufferSource(); src.buffer = buf; src.loop = true;
-    const bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq; bp.Q.value = .6;
-    const g2 = actx.createGain();
-    g2.gain.setValueAtTime(.0001, at);
-    g2.gain.exponentialRampToValueAtTime(peak, at + dur * .4);
-    g2.gain.exponentialRampToValueAtTime(.0001, at + dur);
-    src.connect(bp).connect(g2).connect(master); src.start(at); src.stop(at + dur + .05);
+function startAlarm(){
+  if (!actx || alarm) return;
+  const master = actx.createGain(); master.gain.value = .35; master.connect(actx.destination);
+  // the header is real data: each bit is one of two pitches, 520.83 bits a second
+  const bytes = [...Array(16).fill(0xAB), ...[..."ZCZC-CIV-ADR-000000+0015-3161200-AMALGAM -"].map(c => c.charCodeAt(0))];
+  const bit = 1 / 520.83, burst = bytes.length * 8 * bit, oscs = [];
+  let t = actx.currentTime + .02;
+  for (let k = 0; k < 3; k++){
+    const o = actx.createOscillator(); let bt = t;
+    bytes.forEach(b => { for (let i = 0; i < 8; i++){ o.frequency.setValueAtTime(b >> i & 1 ? 2083.3 : 1562.5, bt); bt += bit; } });
+    o.connect(master); o.start(t); o.stop(t + burst); oscs.push(o);
+    t += burst + .5;
+  }
+  [853, 960].forEach(f => {
+    const o = actx.createOscillator(), half = actx.createGain(); o.frequency.value = f; half.gain.value = .5;
+    o.connect(half).connect(master); o.start(t); oscs.push(o);
+  });
+  alarm = {master, oscs};
+}
+function stopAlarm(fade = .2){
+  if (!alarm) return;
+  const a = alarm, t = actx.currentTime; alarm = null;
+  a.master.gain.setTargetAtTime(.0001, t, fade / 3);
+  a.oscs.forEach(o => o.stop(t + fade + .2));
+  setTimeout(() => a.master.disconnect(), fade * 1000 + 300);
+}
+
+/* ============================================================ sound effects
+   All synthesized, no audio files: cheap plastic beeps, a cash register, error dings.
+   Browsers stay silent until the first click or key press, so the opening is quiet. */
+let sfxOut = null, noiseBuf = null, whine = null;
+function sfxReady(){
+  if (!actx) return false;
+  if (!sfxOut){
+    // boosted well past 1, with a limiter after it so the loudest ones don't crackle
+    const limiter = actx.createDynamicsCompressor();
+    limiter.threshold.value = -6; limiter.knee.value = 4; limiter.ratio.value = 12; limiter.attack.value = .002; limiter.release.value = .1;
+    limiter.connect(actx.destination);
+    sfxOut = actx.createGain(); sfxOut.gain.value = 2.2; sfxOut.connect(limiter);
+    const sr = actx.sampleRate; noiseBuf = actx.createBuffer(1, sr, sr);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  return true;
+}
+// one beep: a pitch (optionally sliding to another) that fades out over dur seconds
+function tone(f, dur, {type="square", vol=.1, at=0, to=0} = {}){
+  if (!sfxReady()) return;
+  const t = actx.currentTime + at, o = actx.createOscillator(), env = actx.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+  env.gain.setValueAtTime(.0001, t); env.gain.exponentialRampToValueAtTime(vol, t + .005); env.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(env).connect(sfxOut); o.start(t); o.stop(t + dur + .02);
+}
+// one burst of filtered static (clacks, crunches)
+function hiss(dur, {freq=2000, vol=.2, at=0} = {}){
+  if (!sfxReady()) return;
+  const t = actx.currentTime + at, src = actx.createBufferSource(), lp = actx.createBiquadFilter(), env = actx.createGain();
+  src.buffer = noiseBuf; lp.type = "lowpass"; lp.frequency.value = freq;
+  env.gain.setValueAtTime(vol, t); env.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  src.connect(lp).connect(env).connect(sfxOut); src.start(t, rand(0, .8)); src.stop(t + dur + .02);
+}
+const sfx = {
+  click: () => tone(rand(820, 980), .05, {to:520, vol:.08}),
+  nav:   () => { tone(660, .06, {type:"triangle", vol:.14}); tone(990, .09, {type:"triangle", vol:.14, at:.06}); },
+  up:    () => tone(500, .12, {type:"triangle", to:1400, vol:.14}),
+  nope:  () => { tone(110, .24, {vol:.07}); tone(117, .24, {vol:.07}); },
+  ching: () => { // ka-ching: drawer clack, then the bell twice
+    hiss(.07, {freq:3000, vol:.3}); tone(140, .08, {vol:.1, to:60});
+    [0, .13].forEach(at => { tone(1976, .8, {type:"sine", vol:.1, at:.07 + at}); tone(2637, .6, {type:"sine", vol:.07, at:.07 + at}); });
+  },
+  pop:   () => { tone(880, .3, {type:"triangle", vol:.13}); tone(587, .45, {type:"triangle", vol:.13, at:.13}); },
+  close: () => tone(380, .08, {type:"sine", to:90, vol:.25}),
+  dodge: () => tone(300, .22, {type:"sine", to:1800, vol:.14}), // slide whistle
+  setback: () => { tone(392, .28, {vol:.05, to:370}); tone(330, .55, {vol:.05, to:262, at:.3}); }, // wah-wahhh
+  chomp: () => [0, .11, .22].forEach(at => { hiss(.09, {freq:900, vol:.45, at}); tone(90, .09, {vol:.12, to:50, at}); }),
+  bloop: () => tone(420, .1, {type:"sine", to:840, vol:.16}),
+  err:   () => tone(rand(300, 900), .12, {vol:.04}),
+  // the oath: a whine that climbs for as long as the button is held
+  holdStart(ms){
+    if (!sfxReady() || whine) return;
+    const t = actx.currentTime, o = actx.createOscillator(), env = actx.createGain();
+    o.type = "triangle"; o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(900, t + ms / 1000);
+    env.gain.setValueAtTime(.0001, t); env.gain.exponentialRampToValueAtTime(.09, t + .08);
+    o.connect(env).connect(sfxOut); o.start(t); whine = {o, env};
+  },
+  holdStop(){ // returns true if it was actually playing
+    if (!whine) return false;
+    const {o, env} = whine, t = actx.currentTime; whine = null;
+    env.gain.cancelScheduledValues(t); env.gain.setTargetAtTime(.0001, t, .03); o.stop(t + .2);
+    return true;
+  },
+};
+["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, unlockAudio, true));
+// every button clicks; a few get their own sound
+document.addEventListener("click", e => {
+  const b = e.target.closest("button, [data-go], .tray"); if (!b || b.disabled) return;
+  if (b.matches("#hold, [data-sso]")) return; // these make their own noise
+  if (b.matches("#add, #add2, [data-add]")) sfx.ching();
+  else if (b.matches("#plus")) sfx.up();
+  else if (b.matches("#minus")) sfx.nope();
+  else if (b.matches(".pop .bar button")) sfx.close();
+  else if (b.dataset.go) sfx.nav();
+  else sfx.click();
+}, true);
+
+/* ============================================================ background music
+   Starts once you're in the shop and plays the list in order, forever. Add songs to assets/music/ and list them here. */
+// track 1 (ENA) is the shop's entrance music: it plays once, and the loop restarts from track 2
+const PLAYLIST = ["assets/music/ena-the-hub.mp3", "assets/music/unnamed-muzak.mp3", "assets/music/seagull-and-clouds.mp3",
+  "assets/music/sunny-jim.mp3", "assets/music/snips.mp3", "assets/music/love-match.mp3", "assets/music/lease.mp3",
+  "assets/music/the-lamp-is-low.mp3", "assets/music/alone.mp3", "assets/music/on-a-clear-day.mp3"];
+// per-track settings. gain (dB) evens out loudness: measured after the record filter, aiming for about -15 LUFS.
+// Tracks that already have one of the record effects baked in get less (or none) of ours, so it isn't doubled.
+const TRACK_FX = {
+  "assets/music/ena-the-hub.mp3": {gain:-2.3},
+  "assets/music/sunny-jim.mp3": {gain:.8},
+  "assets/music/snips.mp3": {gain:.4},
+  "assets/music/love-match.mp3": {gain:-.3},
+  "assets/music/unnamed-muzak.mp3": {reverb:.3, dry:.85},     // has its own reverb; just a touch of ours to match
+  "assets/music/lease.mp3": {fuzz:false, gain:7.7},           // already bitcrushed; the original is very quiet once filtered
+  "assets/music/seagull-and-clouds.mp3": {gain:-5.2, glitch:2.5}, // glitches 2.5x as often
+  "assets/music/the-lamp-is-low.mp3": {gain:.9},
+  "assets/music/alone.mp3": {gain:1.2},
+  "assets/music/on-a-clear-day.mp3": {gain:4.4},
+};
+const MUSIC_VOL = .25;
+const music = new Audio(); let track = 0, musicOn = false;
+music.volume = MUSIC_VOL;
+music.addEventListener("ended", () => playTrack(track + 1 < PLAYLIST.length ? track + 1 : 1)); // loop skips the entrance music
+const trackName = i => PLAYLIST[i].split("/").pop().replace(".mp3", "").replace(/-/g, " ");
+function showTrack(){ $("#dev-track").textContent = `♪ ${track + 1}/${PLAYLIST.length} ${trackName(track)}`; }
+/* ============================================================ music glitches
+   Every so often the music fails: a dropout, a stutter, the record skipping,
+   a tape slowdown, or a digital crunch. TRACK_FX glitch: n makes a track glitch n times as often. */
+const GLITCH_EVERY = 90; // average seconds between glitches on a normal track
+const canSeek = () => music.seekable.length > 0 && music.seekable.end(0) > music.currentTime + 1;
+const glitches = {
+  dropout(){ const t = actx.currentTime; vinyl.gate.gain.setValueAtTime(0, t); vinyl.gate.gain.setValueAtTime(1, t + rand(.15, .6)); },
+  stutter(){ const t = actx.currentTime, step = rand(.03, .07), n = Math.floor(rand(8, 20));
+    for (let i = 0; i < n; i++) vinyl.gate.gain.setValueAtTime(i % 2 ? 1 : 0, t + i * step);
+    vinyl.gate.gain.setValueAtTime(1, t + n * step); },
+  skip(){ // the record trips and repeats a sliver of itself
+    if (!canSeek()) return glitches.stutter();
+    const at = music.currentTime, len = rand(.12, .3), times = Math.floor(rand(3, 7)); let k = 0;
+    const iv = setInterval(() => { if (++k > times || music.paused) return clearInterval(iv); music.currentTime = at; }, len * 1000); },
+  slowdown(){ // tape dragging
+    music.preservesPitch = false;
+    const t0 = performance.now(), dur = rand(500, 1100), low = rand(.25, .5);
+    const iv = setInterval(() => { const p = Math.min(1, (performance.now() - t0) / dur); music.playbackRate = 1 - (1 - low) * p;
+      if (p >= 1){ clearInterval(iv); setTimeout(() => { music.playbackRate = 1; }, rand(100, 300)); } }, 30); },
+  crunch(){ const t = actx.currentTime, d = rand(.6, 1.6);
+    vinyl.gate.gain.setValueAtTime(0, t); vinyl.crushOn.gain.setValueAtTime(1, t);
+    vinyl.crushOn.gain.setValueAtTime(0, t + d); vinyl.gate.gain.setValueAtTime(1, t + d); },
+};
+function glitchNow(kind){
+  if (!vinyl || music.paused) return;
+  glitches[kind || pick(Object.keys(glitches))]();
+}
+// roll the dice once a second; never in the first or last few seconds of a song
+setInterval(() => {
+  if (!vinyl || music.paused || musicMuted || music.currentTime < 5 || music.duration - music.currentTime < 5) return;
+  const k = (TRACK_FX[PLAYLIST[track]] || {}).glitch || 1;
+  if (Math.random() < k / GLITCH_EVERY) glitchNow();
+}, 1000);
+function playTrack(i){
+  track = (i + PLAYLIST.length) % PLAYLIST.length; music.src = PLAYLIST[track]; showTrack(); applyTrackFx();
+  if (musicOn) music.play().catch(() => {});
+}
+// the old-record sound: thin and nasal (no deep bass, no crisp highs), a little fuzz,
+// a slow pitch wobble like a warped disc, needle crackle underneath, and a big empty-mall echo
+const RECORD = {low:300, high:3400, nasal:5, fuzz:2.5, wobble:.0012, crackle:.25, reverb:.7, reverbSeconds:4.5, dry:.65};
+let vinyl = null;
+function vinylChain(){
+  if (vinyl || !actx) return;
+  const f = (type, freq, {Q = 1, gain = 0} = {}) => {
+    const n = actx.createBiquadFilter(); n.type = type; n.frequency.value = freq; n.Q.value = Q; n.gain.value = gain; return n;
   };
-  const cycle = () => { const t = actx.currentTime + .02; puff(t, 1.2, 900, 2.2); puff(t + 1.45, 1.7, 480, 3.2); };
-  cycle();
-  breath = {master, timer: setInterval(cycle, 3400)};
+  const src = actx.createMediaElementSource(music);
+  const hp = f("highpass", RECORD.low), lp = f("lowpass", RECORD.high), horn = f("peaking", 1500, {Q:.8, gain:RECORD.nasal});
+  const fuzz = actx.createWaveShaper(), curve = new Float32Array(1024);
+  for (let i = 0; i < curve.length; i++){ const x = i / 511.5 - 1; curve[i] = Math.tanh(RECORD.fuzz * x) / Math.tanh(RECORD.fuzz); }
+  fuzz.curve = curve; fuzz.oversample = "2x";
+  const warp = actx.createDelay(.05), lfo = actx.createOscillator(), depth = actx.createGain();
+  warp.delayTime.value = .008; lfo.frequency.value = .55; depth.gain.value = RECORD.wobble;
+  lfo.connect(depth).connect(warp.delayTime); lfo.start();
+  const out = actx.createGain(); out.gain.value = MUSIC_VOL; out.connect(actx.destination);
+  const dry = actx.createGain(); dry.gain.value = RECORD.dry; // less direct sound = the speaker is somewhere across the mall
+  const fuzzOn = actx.createGain(), fuzzOff = actx.createGain(); // fuzz path and clean path; one is muted per track
+  const trim = actx.createGain(); // per-track loudness (TRACK_FX gain)
+  // glitch paths (see music glitches below): a gate that can cut the music, and a crushed copy that can replace it
+  const gate = actx.createGain(), crushOn = actx.createGain(), crush = actx.createWaveShaper(), crushCurve = new Float32Array(1024);
+  for (let i = 0; i < crushCurve.length; i++){ const x = i / 511.5 - 1; crushCurve[i] = Math.round(x * 3) / 3; }
+  crush.curve = crushCurve; crushOn.gain.value = 0;
+  src.connect(trim).connect(gate).connect(hp).connect(horn).connect(fuzz).connect(fuzzOn).connect(lp);
+  trim.connect(crushOn).connect(crush).connect(hp);
+  horn.connect(fuzzOff).connect(lp);
+  lp.connect(warp).connect(dry).connect(out);
+  // reverb: a few seconds of fading static as the "room"; the music goes through it, the crackle stays dry and close
+  const room = actx.createConvolver(), wet = actx.createGain(), sr0 = actx.sampleRate, len = Math.floor(sr0 * RECORD.reverbSeconds);
+  const ir = actx.createBuffer(2, len, sr0);
+  for (let ch = 0; ch < 2; ch++){ const d = ir.getChannelData(ch); for (let i = Math.floor(sr0 * .045); i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 2.2; } // 45 ms gap: far-off walls
+  room.buffer = ir; wet.gain.value = RECORD.reverb;
+  warp.connect(room).connect(wet).connect(out);
+  music.volume = 1; // loudness is set by `out` now
+  // crackle: four seconds of faint hiss with random pops, looped
+  const sr = actx.sampleRate, buf = actx.createBuffer(1, sr * 4, sr), d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * .015;
+  for (let n = 0; n < 140; n++){
+    const at = Math.floor(Math.random() * (d.length - 60)), amp = Math.random() ** 3 * .7 * (Math.random() < .5 ? -1 : 1);
+    for (let j = 0; j < 60; j++) d[at + j] += amp * Math.exp(-j / 5);
+  }
+  const crackle = actx.createBufferSource(), crackleHp = f("highpass", 900), crackleVol = actx.createGain();
+  crackle.buffer = buf; crackle.loop = true; crackleVol.gain.value = 0;
+  crackle.connect(crackleHp).connect(crackleVol).connect(out); crackle.start();
+  // the needle only crackles while a song is playing
+  music.addEventListener("playing", () => crackleVol.gain.setTargetAtTime(RECORD.crackle, actx.currentTime, .05));
+  music.addEventListener("pause", () => crackleVol.gain.setTargetAtTime(0, actx.currentTime, .02));
+  vinyl = {out, trim, fuzzOn, fuzzOff, wet, dry, gate, crushOn};
+  applyMute(); applyTrackFx();
 }
-function stopBreathing(fade = .2){
-  if (!breath) return;
-  const b = breath; breath = null; clearInterval(b.timer);
-  b.master.gain.setTargetAtTime(.0001, actx.currentTime, fade / 3);
-  setTimeout(() => b.master.disconnect(), fade * 1000 + 300);
+function applyTrackFx(){
+  if (!vinyl) return;
+  const fx = TRACK_FX[PLAYLIST[track]] || {}, t = actx.currentTime;
+  const fuzz = fx.fuzz !== false, wet = fx.reverb === false ? 0 : fx.reverb ?? RECORD.reverb, dry = fx.dry ?? (wet ? RECORD.dry : 1);
+  // the fuzz also makes things about 2.5x louder at normal levels, so the clean path gets the same boost
+  vinyl.fuzzOn.gain.setTargetAtTime(fuzz ? 1 : 0, t, .02); vinyl.fuzzOff.gain.setTargetAtTime(fuzz ? 0 : 2.5, t, .02);
+  vinyl.trim.gain.setTargetAtTime(10 ** ((fx.gain || 0) / 20), t, .02);
+  vinyl.wet.gain.setTargetAtTime(wet, t, .05); vinyl.dry.gain.setTargetAtTime(dry, t, .05);
 }
+function startMusic(){
+  if (musicOn) return; musicOn = true;
+  if (!music.src) music.src = PLAYLIST[track];
+  vinylChain();
+  // browsers only allow sound after a click; if there hasn't been one yet (a #home link), wait for it
+  music.play().catch(() => {
+    const retry = () => { if (!musicOn) return; vinylChain(); music.play().catch(() => {}); };
+    ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, retry, {once:true}));
+  });
+}
+function pauseMusic(){ music.pause(); }
+// dev: mute only the music (sound effects keep playing); remembered across reloads
+let musicMuted = store.get("musicMuted", false);
+function applyMute(){
+  music.muted = musicMuted;
+  if (vinyl) vinyl.out.gain.value = musicMuted ? 0 : MUSIC_VOL;
+  $("#dev-mute").textContent = musicMuted ? "UNMUTE MUSIC (DEV)" : "MUTE MUSIC (DEV)";
+}
+$("#dev-mute").addEventListener("click", () => { musicMuted = !musicMuted; store.set("musicMuted", musicMuted); applyMute(); }); // testing only
+$("#dev-prev").addEventListener("click", () => playTrack(track - 1)); // testing only
+$("#dev-next").addEventListener("click", () => playTrack(track + 1)); // testing only
+$("#dev-glitch").addEventListener("click", () => glitchNow()); // testing only
+showTrack();
+applyMute();
+function resumeMusic(){ if (musicOn) music.play().catch(() => {}); }
 
 /* ============================================================ SELFIE → PRODUCT
    No AI image generation. A small face-detection library only LOCATES the eyes,
@@ -1309,6 +1669,7 @@ function renderCheckout(){
               <label for="selfie-file" style="font:12px var(--bot)">…or upload one:</label>
               <input type="file" id="selfie-file" accept="image/*" capture="user">
               <span class="hint" id="cam-hint">Please smile. Please smile more. Please hold that.</span>
+              <span style="font:10px var(--bot); color:#777; max-width:34ch">By submitting, your photo is saved to the shop’s inventory as part of this art project.</span>
             </div>
           </div>
         </fieldset>
@@ -1365,15 +1726,59 @@ function renderCheckout(){
     if (!/.+@.+\..+/.test($("#f-email").value)) miss.push("a working email");
     if (!selfieData) miss.push("your face");
     if (!$("#f-human").checked) miss.push("proof you are human (just check the box, we trust you)");
-    if (miss.length){ err.hidden = false; err.textContent = `We still need ${miss.join(", ")}. Every last drop.`; err.scrollIntoView({behavior:"smooth", block:"center"}); return; }
+    if (miss.length){ err.hidden = false; err.textContent = `We still need ${miss.join(", ")}. Every last drop.`; err.scrollIntoView({behavior:"smooth", block:"center"}); sfx.nope(); return; }
     const btn = $("#consume"); btn.disabled = true; btn.textContent = "PROCESSING YOUR FRESHNESS…";
     const job = await (selfieJob || processSelfie(selfieData));
     // only the processed versions are kept — never the original photo
     customer = {name: $("#f-name").value.trim(), email: $("#f-email").value.trim(), variants: job.variants, pick: pick(Object.keys(job.variants))};
     store.set("customer", customer);
+    saveToInventory(customer); // persist to the shared shop database (owner/editors only; outside viewers silently can't write)
     plate = []; store.set("plate", plate); updateCount();
-    showConfirm();
+    sfx.ching(); showConfirm();
   };
+}
+
+/* ============================================================ save listed customers to the shop's shared database
+   Uses the artifact 'db' capability. Writes succeed for the signed-in owner (you) and invited
+   editors; outside/public viewers hold read-only access, so their writes are silently skipped —
+   the piece still works for them locally. Each row: {name, variant, img (distorted selfie), ts}. */
+function shrink(dataUrl, max){
+  return new Promise(res => { const im = new Image();
+    im.onload = () => { const s = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width*s); c.height = Math.round(im.height*s); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      res(c.toDataURL("image/jpeg", .8)); };
+    im.onerror = () => res(dataUrl); im.src = dataUrl; });
+}
+// kiosk archive: when the shop runs from kiosk_server.py on the exhibition computer, every finished checkout's
+// warped selfies are saved as image files in inventory/ and past customers are listed back as products.
+// The public site has no such server, so these calls fail quietly.
+async function loadPast(){
+  try{
+    const r = await fetch("api/inventory", {cache:"no-store"}); if (!r.ok) return;
+    const list = await r.json(); if (!Array.isArray(list)) return;
+    pastCustomers = list;
+    if (!$("#home").hidden) renderHome();
+    renderCustomers();
+  }catch(e){}
+}
+async function saveToKiosk(c){
+  try{
+    const r = await fetch("api/inventory", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({name: c.name, pick: c.pick, variants: c.variants})});
+    if (!r.ok) return;
+    const {id} = await r.json();
+    if (customer === c){ c.invId = id; store.set("customer", c); } // so you aren't listed twice (as "It's You!" and pre-owned)
+    loadPast();
+  }catch(e){}
+}
+async function saveToInventory(c){
+  saveToKiosk(c);
+  try{
+    const db = window.claude && await window.claude.use("db");
+    if (!db) return; // capability not available to this viewer
+    const img = await shrink(c.variants[c.pick], 360); // keep each row well under the 256 KiB doc limit
+    await db.collection("customers").add({ name: c.name || "a customer", variant: c.pick, img, ts: Date.now() });
+  }catch(e){ /* read-only viewer, quota, or offline — ignore; the experience is unaffected */ }
 }
 
 /* ============================================================ 06 CONFIRM → 07 EMAIL → VIRUS → home */
@@ -1389,7 +1794,7 @@ function showInbox(){
     <div class="chrome">From: orders@${BRAND.toLowerCase()}.shop &nbsp;·&nbsp; To: ${customer.email}<b>🚀 Your order has LAUNCHED!!!!</b></div>
     <div class="content"><div class="inner">
       <h2>Dear ${customer.name},</h2>
-      <p>Thank you for shopping with the Delusion Home Shopping Network! Your item is on a rocket ship and will arrive shortly. Very shortly. It may already be there.</p>
+      <p>Thank you for shopping with the AMALGAM Shopping Network! Your item is on a rocket ship and will arrive shortly. Very shortly. It may already be there.</p>
       <p>Click below to download your purchase and track its trajectory.</p>
       <button class="btn pink dl" id="dl">DOWNLOAD YOUR PURCHASE (2.4 KB)</button>
       <p style="font:11px var(--bot);color:#777;margin-top:14px">You are receiving this email because you exist. Unsubscribe: no.</p>
@@ -1402,11 +1807,11 @@ function runVirus(){
   let i = 0;
   const iv = setInterval(() => {
     const w = document.createElement("div"); w.className = "vwin";
-    w.style.left = rand(0, Math.max(10, innerWidth-310)) + "px"; w.style.top = rand(0, Math.max(10, innerHeight-120)) + "px";
-    w.innerHTML = `<div class="bar">${pick(["Setup","Delusion Installer","Warning","Thank You!!"])}</div><div class="b">${msgs[i % msgs.length]}…<div class="prog"><i></i></div></div>`;
+    w.style.left = rand(0, Math.max(10, viewW()-310)) + "px"; w.style.top = rand(0, Math.max(10, viewH()-120)) + "px";
+    w.innerHTML = `<div class="bar">${pick(["Setup","AMALGAM Installer","Warning","Thank You!!"])}</div><div class="b">${msgs[i % msgs.length]}…<div class="prog"><i></i></div></div>`;
     v.appendChild(w); requestAnimationFrame(() => $("i", w).style.setProperty("--p", rand(40,100)+"%"));
-    $("i", w).style.transition = "width 1s"; i++;
-    if (i > 26){ clearInterval(iv);
+    $("i", w).style.transition = "width 1s"; i++; sfx.err();
+    if (i > 26){ clearInterval(iv); sfx.ching();
       const f = document.createElement("div"); f.className = "final";
       f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
@@ -1425,17 +1830,17 @@ const POPS = [
 ];
 let popT = null, popCount = 0;
 function spawnPop(){
-  if ($("#shop").hidden || document.body.classList.contains("gauntlet") || $$(".pop").length >= 3) return;
+  if ($("#shop").hidden || document.body.classList.contains("gauntlet") || $$(".pop").length >= 2) return;
   const p = POPS[popCount++ % POPS.length], el = document.createElement("div"); el.className = "pop";
-  el.style.left = rand(8, Math.max(10, innerWidth - 340)) + "px"; el.style.top = rand(80, Math.max(90, innerHeight - 220)) + "px";
+  el.style.left = rand(8, Math.max(10, viewW() - 340)) + "px"; el.style.top = rand(80, Math.max(90, viewH() - 220)) + "px";
   el.innerHTML = `<div class="bar"><span>${p.t}</span><button type="button" aria-label="Close">×</button></div><div class="body"><div class="big">${p.t}</div><div>${p.b}</div><button class="cta" type="button">${p.c}</button></div>`;
   const x = $(".bar button", el); let dodged = false;
-  x.addEventListener("pointerenter", () => { if (dodged) return; dodged = true; el.style.left = rand(8, Math.max(10, innerWidth - 340)) + "px"; });
+  x.addEventListener("pointerenter", () => { if (dodged) return; dodged = true; el.style.left = rand(8, Math.max(10, viewW() - 340)) + "px"; sfx.dodge(); });
   x.onclick = () => el.remove();
   $(".cta", el).onclick = () => { el.remove(); go("item", p.go) };
-  document.body.appendChild(el);
+  document.body.appendChild(el); sfx.pop();
 }
-function startAnnoyances(){ stopAnnoyances(); popT = setInterval(spawnPop, 14000); setTimeout(spawnPop, 5000); }
+function startAnnoyances(){ stopAnnoyances(); popT = setInterval(spawnPop, 45000); setTimeout(spawnPop, 20000); }
 function stopAnnoyances(){ clearInterval(popT); $$(".pop").forEach(p => p.remove()); }
 
 /* ============================================================ "Sign in with BRAND" window
@@ -1443,7 +1848,9 @@ function stopAnnoyances(){ clearInterval(popT); $$(".pop").forEach(p => p.remove
    blocks pop-ups (e.g. inside the published artifact), a fake window appears
    on the page instead. Same content either way — see SSO_CSS / ssoPage(). */
 const SSO_URL = () => `https://accounts.${BRAND.toLowerCase()}.com/o/oauth2/consent?your_soul=required`;
+const ROOT_CSS = getComputedStyle(document.documentElement);
 const SSO_CSS = `
+  .sso, .sso *{cursor:${ROOT_CSS.getPropertyValue("--arrow")}}
   .sso{font:15px/1.4 system-ui,-apple-system,sans-serif; color:#16110E; padding:28px max(32px, calc(50% - 230px)); display:flex; flex-direction:column; justify-content:center; text-align:center; background:#FFF6E5; min-height:100%; box-sizing:border-box}
   .sso *{box-sizing:border-box}
   .sso .logo{width:56px; height:56px; border-radius:50%; background:#FFD21F; border:3px solid #16110E; display:grid; place-items:center; margin:0 auto 10px; overflow:hidden}
@@ -1452,7 +1859,7 @@ const SSO_CSS = `
   .sso .sub{margin:0 0 22px; color:#444}
   .sso .sub b{color:#C8102E}
   .sso ul{list-style:none; margin:0; padding:0; text-align:left; border-top:1px solid #d9cfbf}
-  .sso li button{all:unset; box-sizing:border-box; width:100%; display:flex; gap:12px; align-items:center; padding:12px 6px; border-bottom:1px solid #d9cfbf; cursor:pointer}
+  .sso li button{all:unset; box-sizing:border-box; width:100%; display:flex; gap:12px; align-items:center; padding:12px 6px; border-bottom:1px solid #d9cfbf; cursor:${ROOT_CSS.getPropertyValue("--hand")}}
   .sso li button:hover{background:#FFD21F}
   .sso .av{width:36px; height:36px; border-radius:50%; flex:none; background:#FF4FA3; color:#fff; display:grid; place-items:center; font:16px "Bungee",sans-serif; overflow:hidden}
   .sso .av img{width:100%; height:100%; object-fit:cover}
@@ -1461,7 +1868,7 @@ const SSO_CSS = `
   .sso .perm li{display:flex; gap:10px; align-items:center; padding:7px 0; border-bottom:1px dashed #d9cfbf}
   .sso .perm input{accent-color:#C8102E; width:18px; height:18px}
   .sso .row{display:flex; gap:10px; justify-content:flex-end}
-  .sso .row button{font:14px "Bungee",sans-serif; padding:10px 18px; border:2px solid #16110E; cursor:pointer; box-shadow:3px 3px 0 #16110E}
+  .sso .row button{font:14px "Bungee",sans-serif; padding:10px 18px; border:2px solid #16110E; cursor:${ROOT_CSS.getPropertyValue("--hand")}; box-shadow:3px 3px 0 #16110E}
   .sso .allow{background:#2FCB5B} .sso .nope{background:#fff}
   .sso .fine{font-size:11px; color:#888; margin-top:22px}
 `;
@@ -1471,12 +1878,12 @@ function ssoPage(step){
   const head = `<div class="logo"><img src="${logo}" alt=""></div>`;
   if (step === "pick") return `${head}
     <h1>Sign in with ${BRAND}™</h1>
-    <p class="sub">Choose an account to continue to<br><b>Delusion Home Shopping Network</b></p>
+    <p class="sub">Choose an account to continue to<br><b>${BRAND} Shopping Network</b></p>
     <ul>
       <li><button data-sso="you"><span class="av">${me ? `<img src="${me}" alt="">` : "Y"}</span><span><div class="nm">You</div><div class="em">you@we-already-know.com</div></span></button></li>
       <li><button data-sso="you"><span class="av" style="background:#1B2FBF">?</span><span><div class="nm">Someone else</div><div class="em">we'll find out anyway</div></span></button></li>
     </ul>
-    <p class="fine">To continue, ${BRAND} will share your name, email address, and remaining years with Delusion Home Shopping Network.</p>`;
+    <p class="fine">To continue, ${BRAND} will share your name, email address, and remaining years with ${BRAND} Shopping Network.</p>`;
   return `${head}
     <h1>${BRAND}™ wants to access your:</h1>
     <ul class="perm">
@@ -1524,18 +1931,19 @@ function runSso(root, close, fsTarget){
   root.addEventListener("click", e => {
     const b = e.target.closest("[data-sso]"); if (!b) return;
     const a = b.dataset.sso;
-    if (a === "you") show("consent");
-    else if (a === "nope"){ b.textContent = "Allow"; b.className = "allow"; b.dataset.sso = "allow"; } // there is no cancel
-    else if (a === "allow"){ close(); ssoSignedIn(); }
+    if (a === "you"){ sfx.click(); show("consent"); }
+    else if (a === "nope"){ sfx.dodge(); b.textContent = "Allow"; b.className = "allow"; b.dataset.sso = "allow"; } // there is no cancel
+    else if (a === "allow"){ sfx.ching(); close(); ssoSignedIn(); }
   });
 }
 $("#signin-btn").addEventListener("click", openSignIn);
 $("#test-sso").addEventListener("click", openSignIn); // testing only
+$("#dev-skip").addEventListener("click", skipToShop); // testing only
 if (store.get("signedIn")) ssoSignedIn();
 
 /* ============================================================ AI chat (scripted) */
 const bot = $("#bot"), log = $("#bot-log");
-const say = (html, who="ai") => { const m = document.createElement("div"); m.className = "msg " + who; m.innerHTML = html; log.appendChild(m); log.scrollTop = log.scrollHeight; };
+const say = (html, who="ai") => { const m = document.createElement("div"); m.className = "msg " + who; m.innerHTML = html; log.appendChild(m); log.scrollTop = log.scrollHeight; if (who === "ai") sfx.bloop(); };
 /* Voice: a flat, polite store chatbot. Short sentences, almost no exclamation points.
    The kookiness is in WHAT it says, never in how loudly. Occasional [[bracket]] glitches. */
 const REPLIES = [
@@ -1579,7 +1987,13 @@ function ask(q){
 }
 
 /* ============================================================ boot */
-if (location.hash === "#home" || location.hash === "#skip"){ $("#oath").hidden = true; $("#shop").hidden = false; go("home"); startAnnoyances(); }
+// dev controls only show when the shop runs on this computer (localhost), never on the public site
+if (!["localhost", "127.0.0.1"].includes(location.hostname)) ["#dev-skip", "#dev-music", "#test-sso"].forEach(s => $(s).style.display = "none");
+loadPast();
+if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
+// jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
+function skipToShop(){ $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; go("home"); startAnnoyances(); startMusic(); }
+if (location.hash === "#home" || location.hash === "#skip") skipToShop();
 else renderHome();
 updateCount();
 </script>
