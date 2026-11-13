@@ -221,6 +221,10 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .card{position:relative; border:3px solid var(--ink); background:var(--card,#fff); padding:12px; cursor:var(--hand); text-align:left;
   box-shadow:6px 6px 0 var(--ink); transform:rotate(var(--r,0deg)); transition:transform .12s, box-shadow .12s; display:flex; flex-direction:column; gap:8px}
 .card:hover{transform:rotate(0) translate(-3px,-3px); box-shadow:10px 10px 0 var(--ink)}
+/* farewell: black flicker + thank-you before the shop resets for the next visitor */
+#thanks{position:fixed; inset:0; z-index:1000; background:#000; display:grid; place-items:center; cursor:none}
+#thanks p{margin:0; padding:0 24px; text-align:center; color:#fff; font:clamp(30px,calc(4*var(--uvw)),64px)/1.1 var(--display); opacity:0; transition:opacity .8s}
+#thanks.say p{opacity:1}
 /* now and then a card shakes for attention (see nudgeCards); uses translate/rotate so it stacks on the card's own tilt */
 .card.nudge{animation:nudge .7s linear}
 @keyframes nudge{
@@ -912,7 +916,7 @@ function go(view, arg){
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]"); if (!g) return;
   go(g.dataset.go, g.dataset.arg);
-  if (g.dataset.scroll) setTimeout(() => document.getElementById(g.dataset.scroll)?.scrollIntoView({behavior:"smooth"}), 30);
+  if (g.dataset.scroll) document.getElementById(g.dataset.scroll)?.scrollIntoView(); // jump straight there, no glide
 });
 const updateCount = () => $("#plate-count").textContent = plate.length;
 
@@ -1328,7 +1332,7 @@ const TRACK_FX = {
   "assets/music/love-match.mp3": {gain:-.3},
   "assets/music/unnamed-muzak.mp3": {reverb:.3, dry:.85},     // has its own reverb; just a touch of ours to match
   "assets/music/lease.mp3": {fuzz:false, gain:7.7},           // already bitcrushed; the original is very quiet once filtered
-  "assets/music/seagull-and-clouds.mp3": {gain:-5.2, glitch:2.5}, // glitches 2.5x as often
+  "assets/music/seagull-and-clouds.mp3": {gain:-5.2},
   "assets/music/the-lamp-is-low.mp3": {gain:.9},
   "assets/music/alone.mp3": {gain:1.2},
   "assets/music/on-a-clear-day.mp3": {gain:4.4},
@@ -1342,7 +1346,7 @@ function showTrack(){ $("#dev-track").textContent = `♪ ${track + 1}/${PLAYLIST
 /* ============================================================ music glitches
    Every so often the music fails: a dropout, a stutter, the record skipping,
    a tape slowdown, or a digital crunch. TRACK_FX glitch: n makes a track glitch n times as often. */
-const GLITCH_EVERY = 90; // average seconds between glitches on a normal track
+const GLITCH_EVERY = 40; // average seconds between glitches on a normal track
 const canSeek = () => music.seekable.length > 0 && music.seekable.end(0) > music.currentTime + 1;
 const glitches = {
   dropout(){ const t = actx.currentTime; vinyl.gate.gain.setValueAtTime(0, t); vinyl.gate.gain.setValueAtTime(1, t + rand(.15, .6)); },
@@ -1447,7 +1451,8 @@ function startMusic(){
     ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, retry, {once:true}));
   });
 }
-function pauseMusic(){ music.pause(); }
+let musicHeld = false; // true while the music is paused on purpose (the jumpscare)
+function pauseMusic(){ musicHeld = true; music.pause(); }
 // dev: mute only the music (sound effects keep playing); remembered across reloads
 let musicMuted = store.get("musicMuted", false);
 function applyMute(){
@@ -1461,7 +1466,15 @@ $("#dev-next").addEventListener("click", () => playTrack(track + 1)); // testing
 $("#dev-glitch").addEventListener("click", () => glitchNow()); // testing only
 showTrack();
 applyMute();
-function resumeMusic(){ if (musicOn) music.play().catch(() => {}); }
+function resumeMusic(){ musicHeld = false; if (musicOn) music.play().catch(() => {}); }
+// after the computer sleeps (lid closed) or the tab was in the background, the sound can stay off: bring it back
+function reviveMusic(){
+  if (!musicOn || musicHeld || farewellStarted) return;
+  if (actx && actx.state !== "running") actx.resume().catch(() => {});
+  if (music.paused && !music.ended) music.play().catch(() => {});
+}
+setInterval(reviveMusic, 2000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) reviveMusic(); });
 
 /* ============================================================ SELFIE → PRODUCT
    No AI image generation. A small face-detection library only LOCATES the eyes,
@@ -1815,9 +1828,41 @@ function runVirus(){
       const f = document.createElement("div"); f.className = "final";
       f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
-        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances(); }, 3200);
+        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances();
+        setTimeout(farewell, SEE_YOURSELF_MS); }, 3200);
     }
   }, 140);
+}
+
+/* ============================================================ farewell → fresh slate (gallery loop)
+   After checkout, visitors get a moment to find themselves listed for sale. Then the screen flickers
+   black, thanks them, wipes this visitor's traces (cart, listing, sign-in) and reloads to the blood oath
+   for the next person. Only a completed checkout triggers this; an idle shop is left alone. */
+const SEE_YOURSELF_MS = 12000;     // time on the shop after checkout, to spot "It's You!"
+const THANKS_MS = 3800;            // how long the thank-you stays up
+let farewellStarted = false;
+
+async function farewell(){
+  if (farewellStarted) return; farewellStarted = true;
+  const o = document.createElement("div"); o.id = "thanks";
+  o.innerHTML = `<p>Thank you for shopping with us :)</p>`; document.body.appendChild(o);
+  // flicker: black on/off a few times, then stay black
+  const beats = [70, 90, 50, 150, 80, 40, 110];
+  for (let i = 0; i < beats.length; i++){ o.style.opacity = i % 2 ? 0 : 1; await new Promise(r => setTimeout(r, beats[i])); }
+  o.style.opacity = 1;
+  music.pause(); stopAnnoyances(); bot.hidden = true;
+  setTimeout(() => o.classList.add("say"), 250);
+  // make sure this visitor's selfie reached the archive before their traces are wiped
+  if (customer?.variants && !customer.invId) await Promise.race([saveToKiosk(customer), new Promise(r => setTimeout(r, 4000))]);
+  await new Promise(r => setTimeout(r, THANKS_MS));
+  freshSlate();
+}
+function freshSlate(){
+  try{
+    Object.keys(localStorage).filter(k => k.startsWith("dhsn-") && k !== "dhsn-musicMuted").forEach(k => localStorage.removeItem(k));
+    sessionStorage.clear();
+  }catch(e){}
+  location.replace(location.pathname); // drop any #home / #skip so it opens on the oath
 }
 
 /* ============================================================ annoyances: popups */
