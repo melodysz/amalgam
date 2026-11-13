@@ -815,6 +815,19 @@ const store = {
   get(k, d){ try{ const v = localStorage.getItem("dhsn-"+k); return v ? JSON.parse(v) : d }catch(e){ return d } },
   set(k, v){ try{ localStorage.setItem("dhsn-"+k, JSON.stringify(v)) }catch(e){} }
 };
+// forget this browser's last visitor (cart, listing, sign-in); the music mute is a dev setting, so it stays
+const wipeVisitor = () => { try{
+  Object.keys(localStorage).filter(k => k.startsWith("dhsn-") && k !== "dhsn-musicMuted").forEach(k => localStorage.removeItem(k));
+  sessionStorage.clear();
+}catch(e){} };
+// every page load that opens on the oath is a new visitor, so nobody inherits the last person's "It's You!".
+// A selfie that never reached the kiosk archive is sent there first (fails quietly on the public site).
+if (location.hash !== "#home" && location.hash !== "#skip"){
+  const last = store.get("customer", null);
+  if (last?.variants && !last.invId) fetch("api/inventory", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({name:last.name, pick:last.pick, variants:last.variants})}).catch(() => {});
+  wipeVisitor();
+}
 let plate = store.get("plate", []);
 let customer = store.get("customer", null); // {name, selfie} once consumed
 const findItem = id => [...allItems(), ...CUT_ITEMS].find(x => x.id === id);
@@ -1962,10 +1975,7 @@ async function farewell(){
   freshSlate();
 }
 function freshSlate(){
-  try{
-    Object.keys(localStorage).filter(k => k.startsWith("dhsn-") && k !== "dhsn-musicMuted").forEach(k => localStorage.removeItem(k));
-    sessionStorage.clear();
-  }catch(e){}
+  wipeVisitor();
   location.replace(location.pathname); // drop any #home / #skip so it opens on the oath
 }
 
@@ -2012,6 +2022,8 @@ function leaveNudge(ms = LEAVE_FIRST_MS){
     document.body.appendChild(back); sfx.pop();
   }, ms);
 }
+// secret for Melody: double-click the logo in the nav to call up the leave-shop window right away
+$("header.top .logo").addEventListener("dblclick", () => leaveNudge(0));
 function startAnnoyances(){ stopAnnoyances(); popT = setInterval(spawnPop, 45000); setTimeout(spawnPop, 20000); }
 function stopAnnoyances(){ clearInterval(popT); $$(".pop:not(.leave-pop)").forEach(p => p.remove()); }
 
