@@ -126,12 +126,11 @@ a{color:var(--royal)}
 #oath .fingerprint{position:absolute; right:calc(4*var(--uvw)); bottom:calc(4*var(--uvh)); z-index:6; width:58px; height:74px; border-radius:50% 50% 46% 46%;
   background:repeating-radial-gradient(ellipse at 50% 60%, transparent 0 3px, #fff 3px 5px); opacity:.85}
 #oath .flash{position:absolute; inset:0; background:var(--liver); opacity:0; pointer-events:none; z-index:10; transition:opacity .35s}
-/* the very first thing a visitor sees: a black screen with one big "shop?" button */
-#oath .gate{position:absolute; inset:0; z-index:10; background:#000; display:grid; place-items:center; transition:opacity .35s}
-#oath .gate.gone{opacity:0; pointer-events:none}
-#shop-q{font:clamp(36px,calc(4.5*var(--uvw)),72px)/1.1 var(--display); color:#fff; background:var(--meat); border:3px solid #fff; border-radius:999px;
-  padding:.05em .7em .15em; animation:beckon 1.8s ease-in-out infinite}
-#shop-q:hover{background:#e01535; animation-play-state:paused; scale:1.06}
+/* "proceed" waits under the typed-out intro; nothing moves on until it's clicked */
+#oath-go{position:absolute; left:50%; bottom:clamp(60px,calc(12*var(--uvh)),140px); translate:-50% 12px; z-index:10; opacity:0; pointer-events:none;
+  font:22px/1 var(--sign); color:#fff; background:none; border:2px solid #fff; border-radius:999px; padding:14px 36px; transition:opacity .6s, translate .6s}
+#oath-go.show{opacity:1; translate:-50% 0; pointer-events:auto; animation:beckon 1.8s ease-in-out .6s infinite}
+#oath-go:hover{background:#fff; color:#000; animation-play-state:paused}
 @keyframes beckon{50%{scale:1.05}}
 /* Opening: the intro line types in word by word on black, then flies up into place as the black dissolves */
 #oath .curtain{position:absolute; inset:0; z-index:8; background:#000; transition:opacity 1.3s ease 1.8s, filter 1.3s ease 1.8s}
@@ -892,11 +891,7 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
   (function opening(){
     const oathEl = $("#oath"), intro = $(".intro", oathEl);
     if (oathEl.hidden) return;
-    const gate = document.createElement("div"); gate.className = "gate";
-    gate.innerHTML = `<button type="button" id="shop-q">shop?</button>`;
-    oathEl.append(gate);
-    const begin = then => { $("#shop-q").onclick = () => { gate.classList.add("gone"); setTimeout(() => gate.remove(), 400); then(); }; };
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return begin(startRoll);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return startRoll();
     // wrap each word (keeping the big <b>V</b> attached to "alued" and the line breaks where they are)
     const words = [];
     let cur = null;
@@ -928,6 +923,12 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
     let i = 0;
     const next = () => {
       if (i < words.length){ words[i++].classList.add("on"); setTimeout(next, 110 + Math.random() * 120); return; }
+      // all typed: wait for "proceed" (that click is also what lets the sound start)
+      const go = document.createElement("button"); go.type = "button"; go.id = "oath-go"; go.textContent = "proceed";
+      oathEl.append(go); setTimeout(() => go.classList.add("show"), 400);
+      go.onclick = () => { go.classList.remove("show"); setTimeout(() => go.remove(), 600); fly(); };
+    };
+    const fly = () => {
       setTimeout(() => {
         // top line leaves first; each line goes just far enough to clear the top edge
         lines.forEach((ln, k) => {
@@ -939,9 +940,9 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
         oathEl.classList.add("revealed");
         startRoll();
         setTimeout(() => { curtain.remove(); intro.hidden = true; oathEl.classList.remove("typing", "revealed"); }, 3300);
-      }, 650);
+      }, 150);
     };
-    begin(() => setTimeout(next, 600)); // nothing happens until they click "shop?"
+    setTimeout(next, 700);
   })();
   function enter(){
     const oathEl = $("#oath"), flash = $(".flash", oathEl);
@@ -2158,7 +2159,6 @@ function ask(q){
 /* ============================================================ boot */
 // dev controls only show when the shop runs on this computer (localhost), never on the public site
 if (!["localhost", "127.0.0.1"].includes(location.hostname)) ["#dev-skip", "#dev-music", "#test-sso"].forEach(s => $(s).style.display = "none");
-if (customer?.variants) leaveNudge(); // already checked out (e.g. the page was reloaded): keep nudging them out
 loadPast();
 if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
 // jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
