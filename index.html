@@ -1,8 +1,16 @@
 <meta charset="utf-8">
 <title>AMALGAM SHOPPING NETWORK</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/favicon-180.png">
+<link rel="apple-touch-icon" href="assets/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bungee&family=Rubik+Wet+Paint&family=Shrikhand&family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans&family=Archivo+Black&family=Cousine&family=Danfo&family=Dokdo&family=Irish+Grover&family=Oi&family=Pinyon+Script&family=Slackey&family=Smokum&family=Sofia&family=Xanh+Mono&display=swap">
 <style>
+/* fonts from Melody's own computer (Rockwell, Big Caslon, Snell Roundhand and Helvetica come with macOS, so the kiosk iMac has them) */
+@font-face{font-family:"Beautiful Maples"; src:url(assets/fonts/beautiful-maples.otf)}
+@font-face{font-family:"unchanged thoughts"; src:url(assets/fonts/unchanged.ttf)}
+@font-face{font-family:"Apple Garamond"; src:local("Apple Garamond"), url(assets/fonts/apple-garamond.ttf)}
 /* ============================================================
    AMALGAM SHOPPING NETWORK — lo-fi prototype, milestone 1
    Deliberately tacky. Single "theme": the catalogue.
@@ -89,31 +97,26 @@ a{color:var(--royal)}
 .drift{position:absolute; pointer-events:none; animation:floaty 5s ease-in-out infinite; z-index:3}
 
 /* ==================== 01  OATH / PORTAL ==================== */
-#oath{position:fixed; inset:0; overflow:hidden; display:grid; place-items:center; z-index:50}
+#oath{position:fixed; inset:0; overflow:hidden; display:grid; place-items:center; z-index:50;
+  background:radial-gradient(ellipse at 50% 45%, #6e0b19, #3f040d 60%, #200105)}
+/* the oath itself scrolls up the screen, under the jaws, over and over */
+#oath .roll{position:absolute; left:0; right:0; top:0; z-index:3; padding-inline:16px; text-align:center; color:#ffe3e8;
+  font:clamp(26px,calc(3.2*var(--uvw)),46px)/1.6 var(--catalogue); transform:translateY(calc(100*var(--uvh))); will-change:transform}
+#oath .roll p{margin:0}
+#oath .roll .last{display:inline-block; margin-top:.6em; color:#ff8fa3}
 #oath .jaw{position:absolute; left:50%; width:min(calc(92*var(--uvw)),980px); transform:translateX(-50%); z-index:4;
   transition:transform .55s cubic-bezier(.7,-0.4,.3,1.4); filter:drop-shadow(0 12px 18px rgba(60,0,0,.45))}
 #oath .jaw.up{top:calc(-6*var(--uvh))}
 #oath .jaw.down{bottom:calc(-8*var(--uvh))}
 #oath.chomp .jaw.up{transform:translate(-50%,calc(44*var(--uvh)))}
 #oath.chomp .jaw.down{transform:translate(-50%,calc(-44*var(--uvh)))}
-#oath.chomp .plate-wrap{transform:scale(.6) rotate(-8deg); opacity:.4}
-#oath .plate-wrap{position:relative; width:min(calc(88*var(--uvw)),720px); aspect-ratio:808/599; display:grid; place-items:center;
-  transition:transform .5s, opacity .5s; z-index:2}
-#oath .lace-red{position:absolute; inset:0; width:100%; height:100%}
-#oath .plate{position:relative; width:62%; aspect-ratio:1; border-radius:50%;
-  background:
-    radial-gradient(circle at 34% 28%, rgba(255,255,255,.55), transparent 22%),
-    radial-gradient(circle, #8f0b1f 0 55%, #5a0514 56% 58%, #a3122a 59% 76%, #6b0818 77% 79%, #b8172f 80% 100%);
-  box-shadow:0 16px 30px rgba(0,0,0,.5), inset 0 0 0 3px rgba(255,255,255,.12);
-  display:grid; place-items:center; text-align:center; color:#fff;
-  font:clamp(10px,calc(1.45*var(--uvw)),15px)/1.45 var(--catalogue);
-}
-#oath .plate p{margin:0; padding:0 22%}
-#oath .needle{position:absolute; width:28%; right:6%; bottom:-6%; transform:rotate(-14deg); z-index:3}
+#oath.chomp .jaw{transition:transform .13s cubic-bezier(.75,0,1,.7)} /* SNAP shut */
 #oath .intro{position:absolute; top:clamp(110px,calc(22*var(--uvh)),190px); left:0; right:0; z-index:5; text-align:center; padding-inline:16px;
   color:#fff; font:clamp(18px,calc(2.4*var(--uvw)),28px)/1.25 var(--catalogue); text-shadow:2px 2px 0 var(--ink)}
 #oath .intro b{font:1.5em var(--catalogue); font-weight:400}
-#oath .swear{position:absolute; bottom:clamp(120px,calc(21*var(--uvh)),200px); z-index:6; display:grid; justify-items:center; gap:10px; padding-inline:16px}
+#oath .swear{position:absolute; bottom:clamp(120px,calc(21*var(--uvh)),200px); z-index:6; display:grid; justify-items:center; gap:10px; padding-inline:16px;
+  opacity:0; translate:0 18px; pointer-events:none; transition:opacity .6s ease, translate .6s cubic-bezier(.3,1.6,.5,1)}
+#oath .swear.show{opacity:1; translate:0 0; pointer-events:auto} /* appears once the oath has been read out */
 #hold{position:relative; overflow:hidden; border:3px solid var(--ink); border-radius:999px; padding:14px 30px;
   background:var(--yolk); font:18px var(--sign); color:var(--ink); box-shadow:5px 5px 0 var(--ink); user-select:none; -webkit-user-select:none; touch-action:none}
 #hold .fill{position:absolute; inset:0; width:0; background:var(--gum); mix-blend-mode:multiply}
@@ -122,7 +125,6 @@ a{color:var(--royal)}
 #oath .fingerprint{position:absolute; right:calc(4*var(--uvw)); bottom:calc(4*var(--uvh)); z-index:6; width:58px; height:74px; border-radius:50% 50% 46% 46%;
   background:repeating-radial-gradient(ellipse at 50% 60%, transparent 0 3px, #fff 3px 5px); opacity:.85}
 #oath .flash{position:absolute; inset:0; background:var(--liver); opacity:0; pointer-events:none; z-index:10; transition:opacity .35s}
-#oath.chomp .flash{opacity:1; transition-delay:.45s}
 /* Opening: the intro line types in word by word on black, then flies up into place as the black dissolves */
 #oath .curtain{position:absolute; inset:0; z-index:8; background:#000; transition:opacity 1.3s ease 1.8s, filter 1.3s ease 1.8s}
 #oath.typing .intro{z-index:9}
@@ -142,30 +144,23 @@ a{color:var(--royal)}
 @keyframes marq{to{transform:translateX(-100%)}}
 
 header.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:30; background:var(--paper);
-  border-bottom:4px double var(--royal); display:flex; align-items:center; gap:16px; padding:8px 16px; flex-wrap:wrap}
-.logo{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--royal); background:none; border:0; padding:0}
-.logo .peep{width:58px; height:42px; background:var(--foam); border:2px solid var(--ink); display:grid; place-items:center; transform:rotate(-4deg)}
-.logo .peep img{width:52px}
-.wordmark{font:28px/1 var(--sign); letter-spacing:-.04em; display:flex; align-items:baseline}
-.wordmark i{font:italic 26px var(--catalogue); color:var(--meat); margin-inline:1px}
-.wordmark u{font:24px var(--display); text-decoration:none; color:var(--slime); -webkit-text-stroke:1px var(--ink)}
-.wordmark small{font:11px var(--catalogue); color:var(--ink); align-self:flex-start; margin-left:4px}
+  border-bottom:4px solid var(--royal); display:flex; align-items:center; gap:16px; padding:8px 16px; min-height:72px; flex-wrap:wrap}
+.logo{display:flex; align-items:center; gap:10px; text-decoration:none; color:#1e29bc; background:none; border:0; padding:0}
+.logo .badge{width:110px; height:auto}
+.wordmark{font:28px/36px Danfo, var(--sign); white-space:nowrap}
 nav.main{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center}
-nav.main button, nav.main .searchbox{border:2px solid var(--ink); background:#fff; padding:6px 12px; font:13px var(--sign); box-shadow:3px 3px 0 var(--ink)}
+nav.main button, nav.main .searchbox{border:1px solid var(--ink); background:#fff; padding:6px 12px; font:13px/16px var(--sign); color:var(--ink); box-shadow:3px 3px 0 var(--ink)}
 nav.main button:hover{background:var(--yolk); transform:rotate(-2deg)}
 nav.main .plate-btn{background:var(--gum); color:#fff}
 .searchbox{display:flex; align-items:center; gap:6px}
-.searchbox input{border:0; font:14px var(--catalogue); width:140px; outline:none; background:transparent}
+.searchbox input{border:0; padding:0; font:13px/16px var(--sign); color:var(--ink); width:172px; outline:none; background:transparent}
+.searchbox input::placeholder{color:var(--ink); opacity:1}
 
-/* hero */
-.hero{position:relative; display:grid; grid-template-columns:1.25fr 1fr; gap:16px; padding:28px 16px 18px; max-width:1400px; margin:0 auto; align-items:end}
-.hero h1{margin:0; font:clamp(44px,calc(7*var(--uvw)),104px)/.88 var(--display); color:var(--royal); -webkit-text-stroke:2px var(--ink);
-  text-shadow:5px 5px 0 #fff, 9px 9px 0 var(--ink); text-wrap:balance}
-.hero h1 em{font:italic clamp(40px,calc(6*var(--uvw)),92px)/.9 var(--catalogue); color:var(--meat); -webkit-text-stroke:0; text-shadow:3px 3px 0 #fff}
-.hero .collab{font:italic 18px/1.5 var(--catalogue); color:var(--meat); margin:18px 0 0; padding:0; list-style:none}
-.hero .collab li::before{content:"★ "}
-.hero .mascot{position:relative; justify-self:center; width:min(100%,460px)}
-.hero .mascot .burst{position:absolute; left:-4%; top:-6%; width:140px; --c:var(--yolk); color:var(--ink); font-size:15px; z-index:2}
+/* hero: carousel of three full-width banners */
+.hero{position:relative; width:100%; aspect-ratio:1470/620; overflow:hidden; border-bottom:1px solid var(--ink); background:var(--ink)}
+.hero .slide{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.6,0,.25,1); transform:translateX(100%)}
+.hero .slide.on{transform:none}
+.hero-corner{position:absolute; right:0; bottom:0; width:calc(504.8 / 1470 * 100%); z-index:1; pointer-events:none} /* stays put while the banners slide */
 .speech{position:absolute; right:0; top:4%; background:#8b3dff; color:#fff; font:13px/1.2 var(--bot); padding:14px 16px; border-radius:50%;
   border:3px solid var(--ink); max-width:170px; text-align:center; z-index:2}
 .speech::after{content:""; position:absolute; left:16px; bottom:-14px; border:10px solid transparent; border-top-color:var(--ink)}
@@ -184,43 +179,37 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .deal .pct{font:28px/1 var(--sign); color:var(--meat)}
 .deal .t{font:13px var(--bot); color:var(--ink); font-variant-numeric:tabular-nums}
 
-.wrap{max-width:1400px; margin:0 auto; padding-inline:16px}
+.wrap{max-width:1470px; margin:0 auto; padding-inline:16px}
 .section-title{display:flex; align-items:end; gap:16px; flex-wrap:wrap; margin:44px 0 16px}
 .section-title h2{margin:0; font:clamp(34px,calc(4.5*var(--uvw)),60px)/.95 var(--display); color:var(--meat); text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
+/* Everyday Goodies header: yellow box + sale stickers */
+.goodies-head{position:relative; height:140px; margin-top:44px}
+.goodies-head .box{position:absolute; left:-20px; top:-11px; width:817px; height:129px; background:#ffe833; border:3px solid #000}
+.goodies-head h2{position:relative; margin:0; font:54px/85px Oi, var(--display); color:var(--royal); -webkit-text-stroke:4px #fbf5ee; paint-order:stroke fill; text-shadow:0 8px 0 #000; white-space:nowrap}
+.goodies-head p{position:relative; margin:5px 0 0; font:bold 15px/15px Helvetica, Arial, sans-serif; letter-spacing:.25em; text-transform:uppercase; white-space:nowrap}
+.goodies-head .sticker{top:var(--y)}
 .section-title p{margin:0; font:italic 18px var(--catalogue); max-width:46ch}
 
-/* ---------- FRESH CUTS: meat trays ---------- */
-.cuts{background:var(--sky); border-block:5px solid var(--ink); padding-block:8px 36px; margin-top:40px;
-  background-image:linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px);
-  background-size:28px 28px}
-.cuts h2{color:var(--royal)!important; font-family:var(--drip)!important; font-size:clamp(40px,calc(5.5*var(--uvw)),76px)!important}
-.trays{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:26px}
-.tray{position:relative; aspect-ratio:4/3; border-radius:22px; cursor:var(--hand);
-  background:
-    radial-gradient(ellipse at 50% 55%, #fffdf6 0 55%, #ece6d6 70%, #d9d2bf 100%);
-  box-shadow:0 10px 0 #cfc7b2, 0 14px 22px rgba(0,0,0,.25); transition:transform .15s}
+/* ---------- FRESH CUTS: meat trays (tray art exported from Figma; labels are live text) ---------- */
+.cuts{background:var(--sky); border-block:5px solid var(--ink); padding-block:24px 40px}
+.cuts h2{margin:0 0 16px; font:66px/1.15 var(--drip); color:#ee1317; text-shadow:0 4px 0 #fff, 0 6px 0 #000}
+.trays{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:48px 39px}
+.tray{position:relative; aspect-ratio:330/247; cursor:var(--hand); transition:transform .15s}
 .tray:hover{transform:translateY(-4px) rotate(-1deg)}
-.tray .well{position:absolute; inset:12% 9%; border-radius:16px; box-shadow:inset 0 4px 10px rgba(0,0,0,.18);
-  background:#fbf7ee; display:grid; place-items:center; overflow:hidden}
-.tray .pad{position:absolute; inset:20% 18%; background:repeating-linear-gradient(90deg,#fff 0 6px,#f3eee6 6px 9px); border-radius:6px; opacity:.9}
-.tray .well img{position:relative; max-width:78%; max-height:78%; object-fit:contain; filter:saturate(1.15)}
-.tray .wrap-film{position:absolute; inset:0; border-radius:22px; pointer-events:none;
-  background:linear-gradient(115deg, rgba(255,255,255,.0) 20%, rgba(255,255,255,.55) 32%, rgba(255,255,255,0) 40%, rgba(255,255,255,.0) 62%, rgba(255,255,255,.35) 70%, rgba(255,255,255,0) 76%);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
-.label{position:absolute; right:-10px; bottom:-14px; width:62%; background:#fff; border:1px solid #bbb; box-shadow:2px 3px 0 rgba(0,0,0,.15);
-  font:10px/1.25 "Courier New", monospace; padding:6px 8px; transform:rotate(-3deg); z-index:2}
-.label .nm{font:13px/1.1 var(--cheap); text-transform:uppercase; margin-bottom:3px}
-.label .row{display:flex; justify-content:space-between}
-.label .barcode{height:18px; margin-top:4px; background:repeating-linear-gradient(90deg,#000 0 1px,#fff 1px 3px,#000 3px 5px,#fff 5px 6px,#000 6px 7px,#fff 7px 10px)}
-.label .pr{font:16px var(--sign); color:var(--meat)}
-.sticker-dot{position:absolute; left:-8px; top:-10px; z-index:2; width:78px; aspect-ratio:1; border-radius:50%; background:var(--yolk); border:3px solid var(--meat);
-  display:grid; place-items:center; text-align:center; font:11px/1 var(--sign); color:var(--meat); transform:rotate(-12deg)}
+.tray .art{position:absolute; left:calc(-20 / 330 * 100%); top:calc(var(--t,-6) / 247 * 100%); width:calc(370 / 330 * 100%); max-width:none; pointer-events:none}
+.label{position:absolute; left:calc(120 / 330 * 100%); top:calc(176 / 247 * 100%); width:calc(196 / 330 * 100%); z-index:2; background:#fff; border:1px solid #bababa;
+  box-shadow:2px 3px 0 rgba(0,0,0,.18); padding:6px 8px; display:flex; flex-direction:column; gap:3px; transform:rotate(-3deg); color:var(--ink)}
+.label .nm{font:12px/1.1 "Archivo Black", var(--cheap); text-transform:uppercase}
+.label .rows{font:10px/1.15 Cousine, "Courier New", monospace; text-transform:uppercase}
+.label .pr{font:15px/1.1 var(--sign); color:var(--meat)}
+.label .barcode{height:16px; background:var(--ink)}
+.sticker{position:absolute; z-index:3; pointer-events:none; max-width:none}
 
 /* ---------- PRODUCT GRID ---------- */
-.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px}
-.card{position:relative; border:3px solid var(--ink); background:var(--card,#fff); padding:12px; cursor:var(--hand); text-align:left;
-  box-shadow:6px 6px 0 var(--ink); transform:rotate(var(--r,0deg)); transition:transform .12s, box-shadow .12s; display:flex; flex-direction:column; gap:8px}
-.card:hover{transform:rotate(0) translate(-3px,-3px); box-shadow:10px 10px 0 var(--ink)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:34px 18px}
+.card{position:relative; border:1px solid #000; background:var(--card,#fff); padding:12px 12px 20px; cursor:var(--hand); text-align:left;
+  box-shadow:6px 8px 0 #000; transform:rotate(var(--r,0deg)); transition:transform .12s, box-shadow .12s; display:flex; flex-direction:column; gap:8px}
+.card:hover{transform:rotate(0) translate(-3px,-3px); box-shadow:9px 11px 0 #000}
 /* farewell: black flicker + thank-you before the shop resets for the next visitor */
 #thanks{position:fixed; inset:0; z-index:1000; background:#000; display:grid; place-items:center; cursor:none}
 #thanks p{margin:0; padding:0 24px; text-align:center; color:#fff; font:clamp(30px,calc(4*var(--uvw)),64px)/1.1 var(--display); opacity:0; transition:opacity .8s}
@@ -233,13 +222,19 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
   40%{translate:5px 1px; rotate:4deg} 50%{translate:-3px -1px; rotate:-2deg} 60%{translate:3px 1px; rotate:2deg}
   70%{translate:-2px 0; rotate:-1deg} 80%{translate:1px 0; rotate:1deg}
 }
-.card .ph{aspect-ratio:1; display:grid; place-items:center; background:var(--ph,#fff6); overflow:hidden; position:relative}
+.card .ph{aspect-ratio:238/240; display:grid; place-items:center; background:var(--ph,#fff6); overflow:hidden; position:relative}
 .card .ph img{max-height:92%; object-fit:contain}
-.card .letter{position:absolute; left:8px; top:8px; width:28px; height:34px; border-radius:50%; border:1.5px solid var(--meat); background:var(--yolk);
-  font:14px/32px var(--catalogue); text-align:center; color:var(--meat)}
-.card h3{margin:0; font:20px/1.05 var(--display); color:var(--royal)}
-.card .blurb{margin:0; font:14px/1.3 var(--catalogue)}
-.card .price{font-size:26px}
+.card .ph img.tile{width:100%; height:100%; max-height:none; object-fit:cover}
+/* corner letter badge, as in the Figma cards */
+.card .letter{position:absolute; left:8px; top:12px; z-index:1; min-width:24px; height:34px; padding:0 3px; border-radius:10px; border:.8px solid #000; background:#fbf5ee;
+  box-shadow:2px 4px 0 #000; font:20px/33px "Xanh Mono", monospace; letter-spacing:-.03em; color:#000; text-align:center}
+.card .letter i{font:500 20px "Big Caslon", "Xanh Mono", serif}
+.card .txt{display:flex; flex-direction:column; gap:5px}
+/* each product has its own title font (--tf, set per item) */
+.card h3{margin:0; font:var(--tf, 19px/1.2 var(--display)); color:var(--royal)}
+.card .blurb{margin:0; font:13px/1.25 "Albert Sans", sans-serif; color:var(--ink)}
+.card .tag-price{font:22px/1.25 Slackey, var(--sign); color:#fbf5ee; -webkit-text-stroke:2px #000; paint-order:stroke fill; text-shadow:0 4px 0 #000; white-space:nowrap}
+.card .tag-price .w{font-family:Rockwell, "Roboto Slab", serif}
 .card .flag{position:absolute; right:-12px; top:-14px; z-index:2; width:96px; font-size:11px; padding:20px}
 .card.soldout .ph{filter:grayscale(1) contrast(1.2)}
 .card.soldout::after{content:"NO LONGER AVAILABLE FOR SALE"; position:absolute; left:-6px; right:-6px; top:36%; background:var(--ink); color:#fff;
@@ -276,7 +271,8 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .exam .eye-chart div:nth-child(2){font-size:18px}.exam .eye-chart div:nth-child(3){font-size:13px}.exam .eye-chart div:nth-child(4){font-size:9px}
 
 /* ---------- customers panel + reviews ---------- */
-.two{display:grid; grid-template-columns:1fr 1.4fr; gap:24px; margin-top:40px}
+.two{display:grid; grid-template-columns:440px 1fr; gap:24px; margin-top:20px; padding-block:20px;
+  background:#ff81bb; box-shadow:0 0 0 100vmax #ff81bb; clip-path:inset(0 -100vmax)} /* pink band, full width */
 .customers{background:#000; color:#7CFF8A; border:4px ridge #aaa; padding:14px; font:13px/1.6 var(--bot); max-height:420px; overflow:auto}
 .customers h3{margin:0 0 8px; color:var(--yolk); font:16px var(--sign)}
 .customers li{list-style:none; display:flex; gap:8px; align-items:center}
@@ -293,14 +289,15 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .review.ko p{font-family:var(--hangul); font-size:19px}
 
 /* ---------- FAQ ---------- */
-.faq{margin-top:40px; background:var(--slime); border:4px solid var(--ink); padding:18px; box-shadow:8px 8px 0 var(--moss)}
-.faq h2{margin:0 0 10px; font:44px var(--display); color:#fff; -webkit-text-stroke:1.5px var(--ink)}
+.faq{margin-top:20px; background:var(--slime); border:4px solid var(--ink); padding:18px; box-shadow:8px 8px 0 var(--moss)}
+.faq h2{margin:0 0 10px; line-height:0}
+.faq h2 img{height:61px}
 .faq details{background:#fff; border:2px solid var(--ink); margin-top:8px; padding:10px 14px}
 .faq summary{font:16px var(--sign); cursor:var(--hand)}
 .faq details p{font:17px/1.45 var(--catalogue); margin:8px 0 2px}
 
 /* footer, neocities-ish */
-footer{margin-top:60px; background:var(--royal); color:#fff; border-top:6px solid var(--ink); padding:28px 16px 40px}
+footer{margin-top:20px; background:var(--royal); color:#fff; border-top:6px solid var(--ink); padding:28px 16px 40px}
 footer .cols{max-width:1400px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px}
 footer h4{margin:0 0 6px; font:15px var(--sign); color:var(--yolk)}
 footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
@@ -493,7 +490,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 
 /* ---------- responsive ---------- */
 @media (max-width:820px){
-  .hero,.pdp,.plate-page,.checkout,.two,.exam{grid-template-columns:1fr}
+  .pdp,.plate-page,.checkout,.two,.exam{grid-template-columns:1fr}
   nav.main{margin-left:0}
   .promo img{height:240px}
   .selfie{grid-template-columns:120px 1fr}
@@ -512,15 +509,11 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 </script>
 
 <!-- ======================= 01 · OATH ======================= -->
-<section id="oath" class="screen sparkle-bg" aria-label="Customer oath">
+<section id="oath" class="screen" aria-label="Customer oath">
   <img class="jaw up" src="assets/upperjaw.png" alt="">
   <p class="intro"><b>V</b>alued customer entering these pages,<br>before you progress, we beseech you to<br>recite the oath below:</p>
-  <div class="plate-wrap">
-    <img class="lace-red" src="assets/lace-red.png" alt="">
-    <div class="plate">
-      <p>I, customer,<br>Do solemnly swear<br>To throw away all inhibitions<br>To trample every restriction<br>And embrace beloved addiction<br>For my home shopping experience<br>I will gladly and madly buy buy buy!<br>I will empty my funds, body, and soul<br>Without regard, regret, or remorse<br>Until every last drop is spent<br>Every last drop.</p>
-    </div>
-    <img class="needle" src="assets/i71671.png" alt="">
+  <div class="roll">
+    <p>I, customer,<br>Do solemnly swear<br>To throw away all inhibitions<br>To trample every restriction<br>And embrace beloved addiction<br>For my home shopping experience<br>I will gladly and madly buy buy buy!<br>I will empty my funds, body, and soul<br>Without regard, regret, or remorse<br>Until every last drop is spent<br><span class="last">Every last drop.</span></p>
   </div>
   <div class="swear">
     <button id="hold" type="button"><span class="fill"></span><span id="hold-label">PRESS &amp; HOLD TO SWEAR</span></button>
@@ -536,53 +529,50 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
   <div class="marquee" aria-hidden="true"><div class="track" id="marquee"></div></div>
   <header class="top">
     <button class="logo" data-go="home" aria-label="Home">
-      <span class="peep"><img src="assets/peepers.png" alt=""></span>
-      <span class="wordmark" id="brand">AM<i>a</i>L<u>g</u>AM<small>™</small></span>
+      <img class="badge" src="assets/logo-badge.png" alt="">
+      <span class="wordmark" id="brand">AMALGAM Shopping Network</span>
     </button>
     <nav class="main" aria-label="Main">
-      <button data-go="home" data-scroll="products">Products</button>
       <label class="searchbox" for="search"><span aria-hidden="true">⌕</span><input id="search" placeholder="search for anything!" autocomplete="off"></label>
-      <button data-go="home" data-scroll="faq">Support</button>
-      <button id="signin-btn" type="button">Sign in</button>
       <button class="plate-btn" data-go="plate">“Cart” (<span id="plate-count">0</span>)</button>
     </nav>
   </header>
 
   <!-- 02 · HOME -->
   <main id="home" class="view">
-    <section class="hero">
-      <div>
-        <h1>AMALGAM <em>Shopping</em> Network</h1>
-        <ul class="collab">
-          <li>in splendid collaboration with the Space Shopping Mall!</li>
-          <li>Looky Mart™</li>
-          <li>…and many more!</li>
-        </ul>
-        <p style="font:15px var(--bot); margin-top:16px">Fresh items! Harvested fresh! Still dripping! It’s too late!<br>Shop shop shop! The only thing that can save you is <b style="color:var(--meat)">SHOPPING!!</b></p>
-      </div>
-      <div class="mascot">
-        <span class="burst wiggle">DEALS YOU WON’T BELIEVE!</span>
-        <div class="speech" id="mascot-speech">&gt;&gt;i’ll take a look at the items</div>
-        <img src="assets/bathtub-mascot.png" alt="Collaged mascot in a bathtub full of sponges">
-      </div>
+    <section class="hero" aria-label="Featured deals" aria-roledescription="carousel">
+      <img class="slide on" src="assets/hero-1.jpg" alt="AMALGAM Shopping Network: plush toys piled into a blue-and-white porcelain teacup.">
+      <img class="slide" src="assets/hero-2.jpg" alt="You opened two gifts this morning. They were your eyes! Want more? Sets A to F of eyes for sale.">
+      <img class="slide" src="assets/hero-3.jpg" alt="Do you taste that? That sea breeze… Cocktail Partner cans on a beach. Fresh today! Rock-bottom prices!">
+      <img class="hero-corner" src="assets/hero-corner.png" alt="It’s good and it’s real!">
     </section>
 
     <div class="deals" id="deals" aria-label="Arbitrary discounts"></div>
 
-    <section class="promo" aria-label="Advertisements">
+    <!-- zine-page ad strip, hidden 2026-11-13; delete the style="display:none" to bring it back -->
+    <section class="promo" aria-label="Advertisements" style="display:none">
       <span class="tag">[AD] [AD] [AD]</span>
       <div class="strip" id="promo-strip"></div>
     </section>
 
-    <section class="cuts">
+    <section class="cuts" aria-label="Fresh cuts">
       <div class="wrap">
-        <div class="section-title" id="cuts-title"><h2>Fresh Cuts!</h2><p>Harvested this morning. Wrapped in hygienic film. Please do not tap the plastic, it upsets them.</p></div>
+        <h2 id="cuts-title">Fresh Cuts!</h2>
         <div class="trays" id="trays"></div>
       </div>
     </section>
 
     <div class="wrap">
-      <div class="section-title" id="products"><h2>Everyday Goodies</h2><p>★ Rest assured! Everything on this website is 100% INORGANICALLY PRODUCED, 300/300 UNETHICALLY SOURCED!</p></div>
+      <div class="goodies-head" id="products">
+        <div class="box"></div>
+        <h2>Everyday Goodies</h2>
+        <p><span style="color:#169a0d">GreAT</span> <span style="color:#f26568">Deals!</span><span style="color:#9057f1"> great </span><span style="color:#1999c6">value!</span> <span style="color:#e00b1c">edible</span><span style="color:#6386f0"> </span><span style="color:#e58d00">for</span><span style="color:#6386f0"> terrestrials!</span></p>
+        <img class="sticker" src="assets/stickers/goodies-mustgo.png" alt="" style="right:12.3px; --y:-15.4px; width:197.8px">
+        <img class="sticker" src="assets/stickers/goodies-crazy.png" alt="" style="right:151.5px; --y:-38.9px; width:195.5px">
+        <img class="sticker" src="assets/stickers/goodies-jump.png" alt="" style="right:319.1px; --y:-38.9px; width:162.9px">
+        <img class="sticker" src="assets/stickers/goodies-todo.png" alt="" style="right:-16px; --y:-42.7px; width:161.8px">
+        <img class="sticker" src="assets/stickers/goodies-items.png" alt="" style="right:447.2px; --y:22.1px; width:166.8px">
+      </div>
       <div class="grid" id="grid"></div>
 
       <!-- hidden for now (2026-11-12); delete the style="display:none" to bring it back -->
@@ -615,13 +605,13 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
           <ul id="customers"></ul>
         </div>
         <div>
-          <div class="section-title" style="margin-top:0"><h2>Reviews!</h2><p>Proudly displayed. Mostly unedited.</p></div>
+          <div class="section-title" style="margin:0 0 14px"><h2 style="font:44px/1.2 var(--display); text-shadow:2px 2px 0 #fff, 4px 4px 0 var(--ink)">Reviews!</h2></div>
           <div class="reviews" id="reviews"></div>
         </div>
       </div>
 
       <section class="faq" id="faq">
-        <h2>FAQ?</h2>
+        <h2><img src="assets/stickers/faq-title.png" alt="FAQ?"></h2>
         <div id="faq-list"></div>
       </section>
     </div>
@@ -735,51 +725,53 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
    ============================================================ */
 const BRAND = "AMALGAM";
 
+// the Everyday Goodies grid, in Figma order (letters match the zine/Figma; there is no K)
 const ITEMS = [
   {id:"bathtub", name:"Blood Bathtub", price:29999999, was:31999999, img:"blood-bathtub.png", tag:"An amazing elixir of youth!",
-   blurb:"The past is in the present.", desc:"For use, fill it up with at least 5.5 liters of blood from a sentient being of intelligence. ^^ Bring your own sentient being.", warn:"Do not drain into municipal pipes. The pipes remember.", card:"#ffe3ea"},
+   blurb:"Re-experience the vitality of youth!", desc:"For use, fill it up with at least 5.5 liters of blood from a sentient being of intelligence. ^^ Bring your own sentient being.", warn:"Do not drain into municipal pipes. The pipes remember.", card:"#ffe3ea", letter:"A", tile:"tiles/bathtub.jpg", tf:"25px/1.2 Smokum", r:0},
   {id:"caterpillars", name:"Fat-Sucking Caterpillars", price:8999999, was:12999999, img:"caterpillar.png", tag:"Watch Your Fat Slide Clean Off!",
-   blurb:"A diet supplement made by the devil!", desc:"It is truly a diet supplement made by the devil, a bug that eats fat: the Aesthetic Caterpillar Egg Cluster! Just take it with water after a meal, and that's it. If you buy now, at this record-breaking special price, we'll even send you a single Happy Maker as a free gift!", warn:"Caterpillars do not know when to stop.", card:"#e9ffe0"},
+   blurb:"A diet supplement to get you back on track!", desc:"It is truly a diet supplement made by the devil, a bug that eats fat: the Aesthetic Caterpillar Egg Cluster! Just take it with water after a meal, and that's it. If you buy now, at this record-breaking special price, we'll even send you a single Happy Maker as a free gift!", warn:"Caterpillars do not know when to stop.", card:"#e9ffe0", letter:"B", tile:"tiles/caterpillars.jpg", tf:"20px/1.2 'Irish Grover'", r:0},
   {id:"bonbons", name:"Mind-Melting Bonbons", price:4999999, img:"i72729.png", tag:"Got memories you’d like to trash?",
-   blurb:"Someone you’d like to keep?", desc:"One bonbon removes one memory of your choosing. Two bonbons remove one memory of OUR choosing. Individually wrapped for freshness.", warn:"May contain traces of your childhood.", card:"#fff0f7"},
+   blurb:"Regrets keep you up late at night?", desc:"One bonbon removes one memory of your choosing. Two bonbons remove one memory of OUR choosing. Individually wrapped for freshness.", warn:"May contain traces of your childhood.", card:"#fff0f7", letter:"C", tile:"tiles/bonbons.jpg", tf:"20px/1.2 Sofia", r:1.2},
   {id:"postit", name:"Unlucky Post-It", price:999999, pend:"postit", pendText:"you know what you did", tag:"A curse item.",
-   blurb:"Sticky. Lightly cursed.", desc:"The user must know the target personally, and the target must discover and read the talisman directly. Stick it on a fridge, a monitor, a forehead.", warn:"Do not write your own name. People keep doing this.", card:"#fffbd0"},
-  {id:"teddy", name:"Happy Ending Teddy", price:19999999, img:"happy-ending-teddy.png", soldout:true, tag:"1999 LIMITED EDITION.",
-   blurb:"It grants the Ending of Life! A peaceful slumber!", desc:"Soft, huggable, and stuffed with something warm. It grants the Ending of Life! A peaceful slumber!", warn:"Do not discard. Neglectful owners will be visited.", card:"#f5e6d6"},
+   blurb:"Sticky. Lightly cursed. For enemies.", desc:"The user must know the target personally, and the target must discover and read the talisman directly. Stick it on a fridge, a monitor, a forehead.", warn:"Do not write your own name. People keep doing this.", card:"#fffbd0", letter:"D", tile:"tiles/postit.jpg", tf:"25px/1.2 'Beautiful Maples'", r:-1.2},
+  {id:"teddy", name:"Happy Ending Teddy", price:19999999, img:"happy-ending-teddy.png", tag:"1999 LIMITED EDITION.",
+   blurb:"Have you ever wanted to end it nicely?", desc:"Soft, huggable, and stuffed with something warm. It grants the Ending of Life! A peaceful slumber!", warn:"Do not discard. Neglectful owners will be visited.", card:"#f5e6d6", letter:"E", tile:"tiles/teddy.jpg", tf:"19px/1.25 Shrikhand", r:0},
   {id:"happymaker", name:"Happy Maker", price:27999999, pend:"pill", pendText:"HAPPY :)", tag:"Rapid pain elimination!",
-   blurb:"For irreversible situations.", desc:"An item that causes rapid pain elimination! In times of irreversible situations, it can be used for euthanasia. Ask your doctor if Happy Maker is right for you. Your doctor is not available.", warn:"Do not operate heavy machinery, or a body.", card:"#e2f3ff"},
-  {id:"bedroom", name:"Your Bedroom", price:13999999, was:14999999, img:"i9170.jpg", tag:"Does this look familiar?",
-   blurb:"Select all images with NEW ITEM.", desc:"Full set: one bed, one wardrobe, one window you leave unlocked. Photographed in-situ for authenticity. 5~15% off if you are currently inside it.", warn:"Item is already at your address.", card:"#ffffff"},
-  {id:"goodfriend", name:"Good Friend", price:15999999, img:"good-friend.png", tag:"It’s your cute animal doll!",
-   blurb:"It will always be with you. Always. :)", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffe8f0"},
+   blurb:"Drink for a smile!", desc:"An item that causes rapid pain elimination! In times of irreversible situations, it can be used for euthanasia. Ask your doctor if Happy Maker is right for you. Your doctor is not available.", warn:"Do not operate heavy machinery, or a body.", card:"#e2f3ff", letter:"F", tile:"tiles/happymaker.jpg", tf:"30px/25px Dokdo", r:1.2},
+  {id:"nepotism", name:"Nepotism", price:13999999, tag:"It runs in the family.",
+   blurb:"We know you want it!", desc:"A luxury fragrance in a heart-shaped bottle. One spritz and doors open, chairs pull out, and somebody’s uncle makes a call. Smells like an inheritance.", warn:"Do not wear to a job you intend to earn.", card:"#ffffff", letter:"G", tile:"tiles/nepotism.jpg", tf:"25px/1.3 'Pinyon Script'", r:-1.2},
   {id:"modify", name:"Make Your Ideal Self Kit", price:34999999, img:"i33110.png", tag:"Modify!",
-   blurb:"Yes, we literally stole these parts!", desc:"It’s simple! It’s a steal! Yes, we literally stole these body parts! Everything is 0% Ethically Sourced! Our special thanks~ to the University of California, Los Angeles~", warn:"Parts may not match. Parts may want to go home.", card:"#ffe8f3"},
+   blurb:"Yes, we literally stole these parts!", desc:"It’s simple! It’s a steal! Yes, we literally stole these body parts! Everything is 0% Ethically Sourced! Our special thanks~ to the University of California, Los Angeles~", warn:"Parts may not match. Parts may want to go home.", card:"#ffe8f3", letter:"H", tile:"tiles/modify.jpg", tf:"25px/1.2 'Apple Garamond'", r:0},
   {id:"lunch", name:"Lunch For Your Child", price:2999999, img:"i2_8.png", tag:"Toys You Can Trust With Your Child! We Promise!",
-   blurb:"Some assembly. Some disassembly.", desc:"A complete, nutritionally balanced lunch. Your child will love it. Your child will love it. Your child will love it.", warn:"Rest assured, all products were once organic pasture-raised sapiens~", card:"#fff3d6"},
-  {id:"stickers", name:"Smiley Stickers :)", price:999999, img:"i72726.png", tag:"The “:)” is part of the name.",
-   blurb:"It’s mandatory. :)", desc:"A sheet of 40 smiley stickers :). Apply to any surface :). Surfaces will smile back :).", warn:"Removing a sticker is considered rude :(", card:"#ffeefc"},
-  {id:"fridge", name:"Refrigerator", price:49999999, pend:"fridge", tag:"Keeps things fresh. Forever.",
-   blurb:"Spacious interior. Inward-facing features.", desc:"A state-of-the-art cooling cabinet with 400 interior spikes for optimal shelf organization. Fits one (1) adult.", warn:"Do not climb inside to check if the light turns off.", card:"#eef2f4"},
+   blurb:"Some assembly. Some disassembly.", desc:"A complete, nutritionally balanced lunch. Your child will love it. Your child will love it. Your child will love it.", warn:"Rest assured, all products were once organic pasture-raised sapiens~", card:"#fff3d6", letter:"I", tile:"tiles/lunch.jpg", tf:"19px/1.25 Shrikhand", r:1.2},
+  {id:"petcat", name:"Pet cat & its pet mouse", price:11999999, tag:"Two pets. One bill.",
+   blurb:"A 2-for-1 STEAL!", desc:"A cat, and the cat’s own pet mouse. They come as a set because they were sold as a set, because nobody could get them apart.", warn:"Do not separate them. They will find each other.", card:"#ffeefc", letter:"J", tile:"tiles/petcat.jpg", tf:"28px/1.1 'unchanged thoughts'", r:-1.2},
   {id:"digicam", name:"I-Digicam", price:6999999, pend:"cam", pendText:"REC ●", tag:"Every photo comes with a guest.",
-   blurb:"Pre-loaded with 7 photos you didn’t take.", desc:"A compact point-and-shoot that develops its own film. The photos on the memory card were already there. Please don’t delete them, they’ve been waiting.", warn:"Do not photograph a mirror.", card:"#e6e6ff"},
-  {id:"poreless", name:"PORELESS", price:7999999, pend:"box", pendText:"PORELESS<small>10,000,000 termite eggs</small>", tag:"Tired of your face?",
-   blurb:"Smooth as shaved wood!", desc:"Fill up your flaws with our PRODUCT: 10 million termite eggs! You’ll be as smooth as shaved wood!", warn:"For external use only. They will not stay external.", card:"#f6f0e0"},
-  {id:"teethjar", name:"Jar of Teeth", price:9999999, pend:"jar", tag:"We’ve all got ’em.",
-   blurb:"9/10 Dentists Approve!", desc:"What do you mean you don’t have teeth? You’re behind on the times! GO! Go get your set TODAY! (We didn’t actually bother asking the dentists.)", warn:"Gums sold separately.", card:"#e8fff6"},
-  {id:"plate", name:"Commemorative Plate", price:3999999, img:"i76121.png", tag:"It’s Not A Party Without You.",
-   blurb:"What do you bring to the table?", desc:"Hand-painted with portraits of our founders. Comes with a display stand. The founders prefer to face the room.", warn:"THE DESIRE TO BE CONSUMED · A VESSEL FOR THE DIVINE · GRATEFUL REMEMBRANCE · ECHOES OF HOPE", card:"#fff8ec"},
-  {id:"postcards", name:"Ominous Postcards", price:1999999, img:"i64065.jpg", tag:"Tuesday Quiz Show applications!",
-   blurb:"Mail one. Receive one back.", desc:"A bundle of vintage postcards. Address one to anyone. Something will reply.", warn:"Due to recent circumstances, we are no longer allowed associated with Tuesday.", card:"#ffffff"},
+   blurb:"With our state-of-the-art facial tracing!", desc:"A compact point-and-shoot that develops its own film. The photos on the memory card were already there. Please don’t delete them, they’ve been waiting.", warn:"Do not photograph a mirror.", card:"#e6e6ff", letter:"L", tile:"tiles/digicam.jpg", tf:"19px/1.25 Shrikhand", r:1.2},
+  {id:"poreless", name:"Poreless", price:7999999, pend:"box", pendText:"PORELESS<small>10,000,000 termite eggs</small>", tag:"Tired of your face?",
+   blurb:"Your new glam—smooth as shaved wood!", desc:"Fill up your flaws with our PRODUCT: 10 million termite eggs! You’ll be as smooth as shaved wood!", warn:"For external use only. They will not stay external.", card:"#f6f0e0", letter:"M", tile:"tiles/poreless.jpg", tf:"bold 25px/1.2 'Snell Roundhand'", r:-1.2},
+  {id:"moretime", name:"More Time", price:9999999, tag:"Tick tock!",
+   blurb:"There’s never enough.", desc:"A cat clock whose eyes follow the minutes as they leave. Every hour you spend looking at it is added to your plate.", warn:"Time purchased is non-refundable.", card:"#e8fff6", letter:"N", tile:"tiles/moretime.jpg", tf:"19px/1.25 Bungee", r:0},
+  {id:"jaws", name:"Clacky Jaws", price:3999999, tag:"Wind them up. Let them go.",
+   blurb:"Wore out your old set? No problem!", desc:"A fresh set of wind-up chompers. Wear them, keep them on the nightstand, or let them walk around the house at night.", warn:"Keep fingers clear of the clacking.", card:"#fff8ec", letter:"O", tile:"tiles/jaws.jpg", tf:"25px/1.2 'Irish Grover'", r:1.2},
+  {id:"goodfriend", name:"Good Friend", price:15999999, img:"good-friend.png", tag:"It’s your cute animal doll!",
+   blurb:"It’s your good friend!", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffffff", letter:"P", tile:"tiles/goodfriend.jpg", tf:"25px/1.2 Smokum", r:0},
 ];
 
+// Fresh Cuts trays: art is exported from Figma (assets/cuts/trayN.png); t = how far the art pokes out above the tray
 const CUTS = [
-  {name:"Teeth, Assorted", img:"lowerjaw.png", wt:"0.42", pr:"9,999,999", sell:"YESTERDAY", link:"teethjar"},
-  {name:"Eyes, Pair (Rental)", img:"peepers.png", wt:"0.07", pr:"1,499,999", sell:"WHEN THEY BLINK", link:"bedroom"},
-  {name:"Buttons, Bone-In", img:"buttonz.png", wt:"1.13", pr:"899,999", sell:"SOON", link:"stickers"},
-  {name:"Catch of the Day (Dry)", img:"lionfish.png", wt:"0.88", pr:"2,999,999", sell:"IT’S TOO LATE", link:"lunch"},
-  {name:"Flank of Spring", img:"hibiscus.png", wt:"0.03", pr:"499,999", sell:"NEVER", link:"bonbons"},
-  {name:"Child’s Armchair, Toothless", img:"i2_4.jpg", wt:"4.20", pr:"5,999,999", sell:"BEFORE IT STANDS UP", link:"teethjar"},
+  {name:"Teeth, Assorted", art:"tray1", t:-43.9, wt:"0.42", sell:"YESTERDAY", pr:"9,999,999", link:"jaws"},
+  {name:"Eyes, Pair (Rental)", art:"tray2", wt:"0.07", sell:"WHEN THEY BLINK", pr:"1,499,999", link:"digicam", sticker:["tray2-sticker", -40.1, -4.9, 134.9]},
+  {name:"Small Child", art:"tray3", wt:"1.13", sell:"BEFORE IT ESCAPES", pr:"899,999", link:"lunch", sticker:["tray3-sticker", 201.3, -68.9, 174.9]},
+  {name:"Catch of the Day (Dry)", art:"tray4", wt:"0.88", sell:"IT’S TOO LATE", pr:"2,999,999", link:"lunch"},
+  {name:"Helping Hands", art:"tray5", wt:"0.03", sell:"NEVER", pr:"499,999", link:"modify"},
+  {name:"Mmm, Apple", art:"tray6", wt:"4.20", sell:"BEFORE IT DRIVES OFF", pr:"999,999", link:"happymaker"},
+  {name:"Bowl of Grapes", art:"tray7", wt:"4.20", sell:"GRAPES", pr:"5,999,999", link:"bonbons"},
+  {name:"Child’s Armchair, Toothless", art:"tray8", t:-6.9, wt:"4.20", sell:"BEFORE IT STANDS UP", pr:"5,999,999", link:"goodfriend"},
 ];
+// stickers slapped across the tray grid (x, y, width in Figma px on the 1438×542 grid)
+const CUTS_STICKERS = [["cuts-sticker1", -16, -30.9, 132], ["cuts-sticker2", 991, 305.1, 180.3], ["cuts-sticker3", 265, 313.1, 128.7]];
 
 /* ============================================================ helpers */
 const $ = (s, r=document) => r.querySelector(s);
@@ -816,9 +808,14 @@ const youItem = () => {
 };
 const youBase = (meta, selfie) => ({id:"you", name:meta.name, price:1, img:null, selfie, isYou:true, tag:meta.tag,
   blurb:`Freshly listed: ${customer.name || "a customer"}.`, desc:`A bipedal primate in its 20s (probably). Gently used. Includes one (1) email address, one (1) blood type, and all past injuries. Recently purchased something on this website.`, warn:"This item is already in your cart. This item is the cart.", card:"var(--gum)"});
+const cardStyle = (it, i = 0) => `--r:${it.r ?? (i % 3 - 1) * 1.2}deg;--card:${it.card}${it.tf ? `;--tf:${it.tf}` : ""}`;
+const cardBody = it => `
+  <div class="ph${it.tile ? "" : " halftone"}">${it.tile ? `<img class="tile" src="assets/${it.tile}" alt="${it.name}">` : imgFor(it)}${it.letter ? `<span class="letter">${it.letter}<i>.</i></span>` : ""}</div>
+  <div class="txt"><h3>${it.name}</h3>${it.blurb ? `<p class="blurb">${it.blurb}</p>` : ""}<div class="tag-price"><span class="w">₩</span>${it.price.toLocaleString("en-US")}</div></div>`;
 const imgFor = (it, cls="") => it.isYou || it.isPast
   ? `<img class="${cls}" src="${it.selfie || it.photo}" alt="${it.isYou ? "You" : it.name}" style="border:4px solid #fff;aspect-ratio:1;object-fit:cover;box-shadow:4px 4px 0 var(--ink)">`
   : it.img ? `<img class="${cls}" src="assets/${it.img}" alt="${it.name}">`
+  : it.tile ? `<img class="${cls}" src="assets/${it.tile}" alt="${it.name}">`
   : `<div class="pend ${it.pend}">${it.pendText || ""}<span class="tapes">PHOTO BEING HARVESTED</span></div>`;
 
 /* ============================================================ 01 OATH */
@@ -845,11 +842,28 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
   ["pointerup","pointerleave","pointercancel"].forEach(ev => btn.addEventListener(ev, stop));
   btn.addEventListener("keydown", e => { if ((e.key===" "||e.key==="Enter") && !e.repeat) start(e) });
   btn.addEventListener("keyup", e => { if (e.key===" "||e.key==="Enter") stop() });
+  // the oath rolls up the screen on a loop; the swear button shows up once the last line reaches the middle
+  const ROLL_SPEED = 110; // px per second
+  let rolling = false;
+  function startRoll(){
+    if (rolling) return; rolling = true;
+    const roll = $("#oath .roll"), last = $(".last", roll), swear = $("#oath .swear");
+    let y = viewH(), prev = 0;
+    (function frame(now){
+      if ($("#oath").hidden) return;
+      y -= ROLL_SPEED * (prev ? Math.min(.1, (now - prev) / 1000) : 0); prev = now;
+      if (y < -roll.offsetHeight) y = viewH(); // gone off the top: start again from the bottom
+      roll.style.transform = `translateY(${y}px)`;
+      if (!swear.classList.contains("show") && y + last.offsetTop < viewH() * .5){ swear.classList.add("show"); sfx.pop(); }
+      requestAnimationFrame(frame);
+    })(performance.now());
+  }
   // Opening: black screen, the intro line types in word by word in the middle, then flies up off the top and
   // dissolves while the black dissolves away
   (function opening(){
     const oathEl = $("#oath"), intro = $(".intro", oathEl);
-    if (oathEl.hidden || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (oathEl.hidden) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return startRoll();
     // wrap each word (keeping the big <b>V</b> attached to "alued" and the line breaks where they are)
     const words = [];
     let cur = null;
@@ -890,14 +904,26 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
         });
         intro.classList.add("fly");
         oathEl.classList.add("revealed");
+        startRoll();
         setTimeout(() => { curtain.remove(); intro.hidden = true; oathEl.classList.remove("typing", "revealed"); }, 3300);
       }, 650);
     };
     setTimeout(next, 700);
   })();
   function enter(){
-    $("#oath").classList.add("chomp"); sfx.chomp();
-    setTimeout(() => { $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; startMusic(); store.set("sworn", true); go("home"); startAnnoyances(); }, 1100);
+    const oathEl = $("#oath"), flash = $(".flash", oathEl);
+    oathEl.classList.add("chomp"); sfx.chomp();
+    // the jaws slam shut, then the screen strobes red/black before the shop cuts in
+    const beats = [60, 45, 70, 40, 55, 35, 80, 45, 40, 65, 50, 90];
+    let k = 0;
+    setTimeout(function flicker(){
+      flash.style.transition = "none"; flash.style.opacity = 1;
+      flash.style.background = k % 2 ? "#000" : "var(--meat)";
+      if (k < beats.length) setTimeout(flicker, beats[k++]); else showShop();
+    }, 150);
+  }
+  function showShop(){
+    $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; startMusic(); store.set("sworn", true); go("home"); startAnnoyances();
   }
 })();
 
@@ -923,12 +949,9 @@ const updateCount = () => $("#plate-count").textContent = plate.length;
 /* ============================================================ 02 HOME */
 function renderHome(){
   $("#grid").innerHTML = allItems().map((it,i) => `
-    <button class="card ${it.soldout?"soldout":""} ${it.isYou?"you":""}" data-go="item" data-arg="${it.id}" style="--r:${(i%3-1)*1.2}deg;--card:${it.card}">
-      ${it.isYou ? `<span class="burst flag wiggle" style="--c:var(--yolk);color:var(--meat)">NEW!! JUST LISTED</span>` : it.isPast ? `<span class="burst flag" style="--c:var(--sky)">BACK IN STOCK</span>` : i%5===1 ? `<span class="burst flag" style="--c:var(--meat)">GREAT VALUE</span>` : ""}
-      <div class="ph halftone">${imgFor(it)}<span class="letter">${String.fromCharCode(65+i)}.</span></div>
-      <h3>${it.name}</h3>
-      <p class="blurb">${it.blurb}</p>
-      <div class="price">${won(it.price)}</div>
+    <button class="card ${it.soldout?"soldout":""} ${it.isYou?"you":""}" data-go="item" data-arg="${it.id}" style="${cardStyle(it, i)}">
+      ${it.isYou ? `<span class="burst flag wiggle" style="--c:var(--yolk);color:var(--meat)">NEW!! JUST LISTED</span>` : it.isPast ? `<span class="burst flag" style="--c:var(--sky)">BACK IN STOCK</span>` : ""}
+      ${cardBody(it)}
     </button>`).join("");
   updateCount();
 }
@@ -950,19 +973,19 @@ function renderHome(){
 })();
 
 // tray section
+const pct = (v, of) => `calc(${v} / ${of} * 100%)`;
 $("#trays").innerHTML = CUTS.map(c => `
-  <div class="tray" role="button" tabindex="0" data-go="item" data-arg="${c.link}" aria-label="${c.name}">
-    <div class="well"><div class="pad"></div><img src="assets/${c.img}" alt=""></div>
-    <div class="wrap-film"></div>
-    <span class="sticker-dot">FRESH<br>TODAY!</span>
+  <div class="tray" role="button" tabindex="0" data-go="item" data-arg="${c.link}" aria-label="${c.name}"${c.t ? ` style="--t:${c.t}"` : ""}>
+    <img class="art" src="assets/cuts/${c.art}.png" alt="">
+    ${c.sticker ? `<img class="sticker" src="assets/cuts/${c.sticker[0]}.png" alt="" style="left:${pct(c.sticker[1], 330)}; top:${pct(c.sticker[2], 247)}; width:${pct(c.sticker[3], 330)}">` : ""}
     <div class="label">
       <div class="nm">${c.name}</div>
-      <div class="row"><span>NET WT</span><span>${c.wt} SOULS</span></div>
-      <div class="row"><span>SELL BY</span><span>${c.sell}</span></div>
-      <div class="row"><span>PRICE</span><span class="pr">₩${c.pr}</span></div>
+      <div class="rows">NET WT ${c.wt} KG<br>SELL BY: ${c.sell}</div>
+      <div class="pr">₩${c.pr}</div>
       <div class="barcode"></div>
     </div>
-  </div>`).join("");
+  </div>`).join("") + CUTS_STICKERS.map(([f, x, y, w]) =>
+  `<img class="sticker" src="assets/cuts/${f}.png" alt="" style="left:${pct(x, 1438)}; top:${pct(y, 542)}; width:${pct(w, 1438)}">`).join("");
 $$(".tray").forEach(t => t.addEventListener("keydown", e => { if (e.key==="Enter") t.click() }));
 
 // promo strip: your zine pages, duplicated for a seamless loop
@@ -995,16 +1018,41 @@ $("#marquee").innerHTML = [...MARQ, ...MARQ].map(m => `<span>★ ${m}</span>`).j
 // visitor counter
 $("#counter").innerHTML = String(Math.floor(rand(1e6, 9e6))).split("").map(d => `<span>${d}</span>`).join("");
 
-// mascot speech cycles
-const SPEECH = [">>i’ll take a look at the items",">>this one is still warm",">>do you like my bath",">>i can see you shopping",">>add to plate add to plate"];
-let si = 0; setInterval(() => { $("#mascot-speech").textContent = SPEECH[++si % SPEECH.length] }, 3500);
+// hero carousel: a new banner slides in every few seconds; now and then it spins
+// through all of them like a slot machine before settling on one
+(function heroCarousel(){
+  const HERO_MS = 6000, SPIN_CHANCE = .3;
+  const slides = [...document.querySelectorAll(".hero .slide")];
+  let cur = 0;
+  function go(n, ms = 700){
+    const from = slides[cur], to = slides[n % slides.length];
+    const move = `transform ${ms}ms ${ms < 300 ? "linear" : "cubic-bezier(.6,0,.25,1)"}`;
+    to.style.transition = "none"; to.style.transform = "translateX(100%)"; to.offsetWidth; // park it off to the right first
+    to.style.transition = from.style.transition = move;
+    to.style.transform = ""; from.style.transform = "translateX(-100%)";
+    from.classList.remove("on"); to.classList.add("on");
+    cur = n % slides.length;
+  }
+  function spin(done){
+    const steps = slides.length * (2 + Math.floor(Math.random() * 3)) + Math.floor(Math.random() * slides.length);
+    let k = 0;
+    (function step(){
+      const ms = Math.round(60 + 640 * (k / steps) ** 3); // fast at first, slowing to a stop
+      go(cur + 1, ms);
+      if (++k < steps) setTimeout(step, ms); else setTimeout(done, ms);
+    })();
+  }
+  (function next(){
+    setTimeout(() => Math.random() < SPIN_CHANCE ? spin(next) : (go(cur + 1), setTimeout(next, 700)), HERO_MS);
+  })();
+})();
 
 // search: "corrects" you
 $("#search").addEventListener("keydown", e => {
   if (e.key !== "Enter") return;
   const q = e.target.value.trim(); if (!q) return;
   e.target.value = ""; e.target.placeholder = `did you mean: “teeth”?`;
-  setTimeout(() => go("item", "teethjar"), 700);
+  setTimeout(() => go("item", "jaws"), 700);
 });
 
 // vision exam
@@ -1081,7 +1129,7 @@ function renderItem(id){
       </div>
     </div>
     <div class="section-title"><h2 style="font-size:36px">Customers who bought this were also bought by:</h2></div>
-    <div class="grid">${others.map(o => `<button class="card" data-go="item" data-arg="${o.id}" style="--card:${o.card}"><div class="ph halftone">${imgFor(o)}</div><h3>${o.name}</h3><div class="price">${won(o.price)}</div></button>`).join("")}</div>`;
+    <div class="grid">${others.map(o => `<button class="card" data-go="item" data-arg="${o.id}" style="${cardStyle(o)}">${cardBody(o)}</button>`).join("")}</div>`;
   $$(".vbtn").forEach(b => b.onclick = () => { customer.pick = b.dataset.v; store.set("customer", customer); renderItem("you"); });
   const q = $("#q"), qn = $("#qn");
   $("#plus").onclick = () => { qty += Math.floor(rand(1,4)); q.textContent = qty; qn.textContent = qty > 3 ? "good. GOOD." : "" };
@@ -1161,8 +1209,7 @@ function renderUpsell(){
     </div>
     <div class="section-title"><h2 style="font-size:32px">Customers like you also added:</h2></div>
     <div class="grid ups">${picks.map(o => `
-      <div class="card" style="--card:${o.card}">
-        <div class="ph halftone">${imgFor(o)}</div><h3>${o.name}</h3><div class="price">${won(o.price)}</div>
+      <div class="card" style="${cardStyle(o)}">${cardBody(o)}
         <button class="btn" type="button" data-add="${o.id}">+ ADD TO PLATE</button>
       </div>`).join("")}</div>`;
   $$("[data-add]", $("#upsell")).forEach(b => b.onclick = () => {
@@ -1867,9 +1914,9 @@ function freshSlate(){
 
 /* ============================================================ annoyances: popups */
 const POPS = [
-  {t:"CONGRATULATIONS!!", b:"You are our 1,000,000th visitor (this week)!", c:"CLAIM PRIZE", go:"teethjar"},
+  {t:"CONGRATULATIONS!!", b:"You are our 1,000,000th visitor (this week)!", c:"CLAIM PRIZE", go:"moretime"},
   {t:"Vitality Alert", b:"Your vitality is <b>LOW</b>. Shop to restore?", c:"RESTORE", go:"bathtub"},
-  {t:"HOT SINGLES", b:"…teeth! In your area! Looking for a mouth!", c:"MEET THEM", go:"teethjar"},
+  {t:"HOT SINGLES", b:"…teeth! In your area! Looking for a mouth!", c:"MEET THEM", go:"jaws"},
   {t:"Flower Golden Resort", b:"Let’s go to paradise together. It’s okay to go! It’s okay to go!", c:"GO", go:"happymaker"},
   {t:"We use cookies", b:"…and teeth, and a little bit of your hair. Accept all?", c:"ACCEPT ALL", go:"modify"},
 ];
@@ -1938,7 +1985,6 @@ function ssoPage(step){
     <p class="fine">You can revoke access at any time. You will not want to.</p>`;
 }
 function ssoSignedIn(){
-  const b = $("#signin-btn"); b.textContent = "Signed in ✓"; b.disabled = true;
   store.set("signedIn", true);
 }
 function openSignIn(){
@@ -1981,7 +2027,6 @@ function runSso(root, close, fsTarget){
     else if (a === "allow"){ sfx.ching(); close(); ssoSignedIn(); }
   });
 }
-$("#signin-btn").addEventListener("click", openSignIn);
 $("#test-sso").addEventListener("click", openSignIn); // testing only
 $("#dev-skip").addEventListener("click", skipToShop); // testing only
 if (store.get("signedIn")) ssoSignedIn();
