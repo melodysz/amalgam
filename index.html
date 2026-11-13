@@ -152,6 +152,7 @@ nav.main{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:ce
 nav.main button, nav.main .searchbox{border:1px solid var(--ink); background:#fff; padding:6px 12px; font:13px/16px var(--sign); color:var(--ink); box-shadow:3px 3px 0 var(--ink)}
 nav.main button:hover{background:var(--yolk); transform:rotate(-2deg)}
 nav.main .plate-btn{background:var(--gum); color:#fff}
+nav.main .leave-btn{background:var(--ink); color:var(--yolk)} /* only shows once you have checked out */
 .searchbox{display:flex; align-items:center; gap:6px}
 .searchbox input{border:0; padding:0; font:13px/16px var(--sign); color:var(--ink); width:172px; outline:none; background:transparent}
 .searchbox input::placeholder{color:var(--ink); opacity:1}
@@ -214,6 +215,8 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 #thanks{position:fixed; inset:0; z-index:1000; background:#000; display:grid; place-items:center; cursor:none}
 #thanks p{margin:0; padding:0 24px; text-align:center; color:#fff; font:clamp(30px,calc(4*var(--uvw)),64px)/1.1 var(--display); opacity:0; transition:opacity .8s}
 #thanks.say p{opacity:1}
+#thanks small{display:block; margin-top:.9em; font:italic clamp(16px,calc(1.6*var(--uvw)),26px)/1.3 var(--catalogue); color:#ff8fa3; opacity:0; transition:opacity .8s 1.2s}
+#thanks.say small{opacity:1}
 /* now and then a card shakes for attention (see nudgeCards); uses translate/rotate so it stacks on the card's own tilt */
 .card.nudge{animation:nudge .7s linear}
 @keyframes nudge{
@@ -534,6 +537,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
     </button>
     <nav class="main" aria-label="Main">
       <label class="searchbox" for="search"><span aria-hidden="true">⌕</span><input id="search" placeholder="search for anything!" autocomplete="off"></label>
+      <button class="leave-btn" id="leave-btn" type="button" hidden>Leave shop</button>
       <button class="plate-btn" data-go="plate">“Cart” (<span id="plate-count">0</span>)</button>
     </nav>
   </header>
@@ -674,11 +678,8 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 
 <!-- 06 · CONFIRMATION -->
 <section id="confirm-screen" class="screen" hidden>
-  <div class="rocket" aria-hidden="true"><span class="ship"></span></div>
-  <img class="smile" src="assets/smiley.jpg" alt="Grinning smiley face: Something bad will happen soon.">
   <h1>ORDER CONFIRMED!!</h1>
-  <p>Your item is coming to you on a <b>ROCKET SHIP!</b></p>
-  <p id="confirm-email"></p>
+  <p>Your item is coming <b>STRAIGHT TO YOU!</b></p>
   <p style="font:13px var(--bot); color:var(--sky)">No returns. No refunds. No return.</p>
 </section>
 
@@ -1712,13 +1713,9 @@ function renderCheckout(){
           <div class="field"><label for="f-eth">Ethnicity</label><input id="f-eth"></div>
           <div class="field full"><label for="f-inj">Past injuries</label><textarea id="f-inj" rows="2" placeholder="list all. this is for product quality control."></textarea><span class="hint">we check.</span></div>
         </fieldset>
-        <fieldset><legend>DELIVERY</legend>
-          <div class="field"><label for="f-email">Email (necessary)</label><input id="f-email" type="email" required placeholder="where we send your rocket ship"></div>
-          <div class="field"><label for="f-addr">Address</label><input id="f-addr" placeholder="or just leave the window open"></div>
-        </fieldset>
         <fieldset><legend>PAYMENT</legend>
           <div class="field full"><div class="pay-toggle" role="group" aria-label="Payment method"><button type="button" data-pay="card" aria-pressed="true">CARD</button><button type="button" data-pay="secret" aria-pressed="false">PAY IN SECRETS</button></div></div>
-          <div class="field full" id="pay-card"><label for="f-card">Card number</label><input id="f-card" inputmode="numeric" placeholder="1234 5678 9012 TEETH"><span class="hint">and the 3 numbers on the back. and the 3 numbers on your back.</span></div>
+          <div class="field full" id="pay-card"><label for="f-card">Card number</label><input id="f-card" inputmode="numeric" placeholder="1234 5678 9012 TEETH"></div>
           <div class="field full" id="pay-secret" hidden><label for="f-secret">Tell us a secret worth ₩<span id="owed"></span></label><textarea id="f-secret" rows="3" placeholder="something you have never said out loud"></textarea><span class="hint">we will not tell anyone. we will tell everyone.</span></div>
         </fieldset>
         <fieldset><legend>SELFIE (REQUIRED FOR FRESHNESS)</legend>
@@ -1783,14 +1780,13 @@ function renderCheckout(){
     e.preventDefault();
     const err = $("#co-err"), miss = [];
     if (!$("#f-name").value.trim()) miss.push("a name");
-    if (!/.+@.+\..+/.test($("#f-email").value)) miss.push("a working email");
     if (!selfieData) miss.push("your face");
     if (!$("#f-human").checked) miss.push("proof you are human (just check the box, we trust you)");
     if (miss.length){ err.hidden = false; err.textContent = `We still need ${miss.join(", ")}. Every last drop.`; err.scrollIntoView({behavior:"smooth", block:"center"}); sfx.nope(); return; }
     const btn = $("#consume"); btn.disabled = true; btn.textContent = "PROCESSING YOUR FRESHNESS…";
     const job = await (selfieJob || processSelfie(selfieData));
     // only the processed versions are kept — never the original photo
-    customer = {name: $("#f-name").value.trim(), email: $("#f-email").value.trim(), variants: job.variants, pick: pick(Object.keys(job.variants))};
+    customer = {name: $("#f-name").value.trim(), variants: job.variants, pick: pick(Object.keys(job.variants))};
     store.set("customer", customer);
     saveToInventory(customer); // persist to the shared shop database (owner/editors only; outside viewers silently can't write)
     plate = []; store.set("plate", plate); updateCount();
@@ -1845,16 +1841,15 @@ async function saveToInventory(c){
 function showConfirm(){
   stopAnnoyances();
   $("#shop").hidden = true; $("#confirm-screen").hidden = false; window.scrollTo(0,0);
-  $("#confirm-email").innerHTML = `A confirmation has been sent to <b>${customer.email}</b>. Please check your inbox. Please check it now. Please.`;
   setTimeout(showInbox, 4200);
 }
 function showInbox(){
   const box = $("#inbox"); box.hidden = false;
   box.innerHTML = `<div class="mail" role="dialog" aria-label="New email">
-    <div class="chrome">From: orders@${BRAND.toLowerCase()}.shop &nbsp;·&nbsp; To: ${customer.email}<b>🚀 Your order has LAUNCHED!!!!</b></div>
+    <div class="chrome">From: orders@${BRAND.toLowerCase()}.shop &nbsp;·&nbsp; To: ${customer.name}<b>Your order is coming STRAIGHT TO YOU!!!!</b></div>
     <div class="content"><div class="inner">
       <h2>Dear ${customer.name},</h2>
-      <p>Thank you for shopping with the AMALGAM Shopping Network! Your item is on a rocket ship and will arrive shortly. Very shortly. It may already be there.</p>
+      <p>Thank you for shopping with the AMALGAM Shopping Network! Your item is coming straight to you and will arrive shortly. Very shortly. It may already be there.</p>
       <p>Click below to download your purchase and track its trajectory.</p>
       <button class="btn pink dl" id="dl">DOWNLOAD YOUR PURCHASE (2.4 KB)</button>
       <p style="font:11px var(--bot);color:#777;margin-top:14px">You are receiving this email because you exist. Unsubscribe: no.</p>
@@ -1875,24 +1870,22 @@ function runVirus(){
       const f = document.createElement("div"); f.className = "final";
       f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
-        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances();
-        setTimeout(farewell, SEE_YOURSELF_MS); }, 3200);
+        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances(); $("#leave-btn").hidden = false; }, 3200);
     }
   }, 140);
 }
 
 /* ============================================================ farewell → fresh slate (gallery loop)
-   After checkout, visitors get a moment to find themselves listed for sale. Then the screen flickers
-   black, thanks them, wipes this visitor's traces (cart, listing, sign-in) and reloads to the blood oath
-   for the next person. Only a completed checkout triggers this; an idle shop is left alone. */
-const SEE_YOURSELF_MS = 12000;     // time on the shop after checkout, to spot "It's You!"
+   After checkout, visitors can stay as long as they like (to try the filters on their listing). When they
+   click "Leave shop" (in the nav, shown only after checkout) the screen flickers black, thanks them, wipes
+   this visitor's traces (cart, listing, sign-in) and reloads to the blood oath for the next person. */
 const THANKS_MS = 3800;            // how long the thank-you stays up
 let farewellStarted = false;
 
 async function farewell(){
   if (farewellStarted) return; farewellStarted = true;
   const o = document.createElement("div"); o.id = "thanks";
-  o.innerHTML = `<p>Thank you for shopping with us :)</p>`; document.body.appendChild(o);
+  o.innerHTML = `<p>Thank you for shopping with us :)<small>You have been exhausted of all your worth.</small></p>`; document.body.appendChild(o);
   // flicker: black on/off a few times, then stay black
   const beats = [70, 90, 50, 150, 80, 40, 110];
   for (let i = 0; i < beats.length; i++){ o.style.opacity = i % 2 ? 0 : 1; await new Promise(r => setTimeout(r, beats[i])); }
@@ -2079,6 +2072,7 @@ function ask(q){
 /* ============================================================ boot */
 // dev controls only show when the shop runs on this computer (localhost), never on the public site
 if (!["localhost", "127.0.0.1"].includes(location.hostname)) ["#dev-skip", "#dev-music", "#test-sso"].forEach(s => $(s).style.display = "none");
+$("#leave-btn").hidden = !customer?.variants; $("#leave-btn").onclick = farewell; // "Leave shop" appears after checkout
 loadPast();
 if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
 // jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
