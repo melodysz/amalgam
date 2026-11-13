@@ -39,9 +39,10 @@
   --catalogue:"Times New Roman", Times, serif;
   --hangul:"Black Han Sans", "Apple SD Gothic Neo", sans-serif;
   --drip:"Rubik Wet Paint", "Shrikhand", cursive;
-  /* old pixel cursors (same as assets/cursor-arrow.png / cursor-hand.png, inlined so the sign-in pop-up window gets them too) */
-  --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAYAAADeB1slAAAAa0lEQVR42uXXsQoAIAgEUP//p2upJSrKPD3pwFEeTqqISGkFixsAg3yAHgTkCyCgGMASigUsIA7gBeICNBAncANxAydQDmAHcQKTVbuqYMBiIcUA46h5gEljEuCgQQ25AbADDQ78c8NyfkQVozYPOC/55EMAAAAASUVORK5CYII=") 0 0, default;
-  --hand:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAmCAYAAAClI5npAAAAbElEQVR42u3WwQoAEBAEUP//05SjwqYxBjO1N7WvzUpK8eSm6DkGqA3bMCEGGGCAPGD7A6UNYMDuBARgeoDeAShgtMbHAKGRoaMPmI30KcDSZXsSMIQYwGgsA9gK+RcA+wcwAVCIAfcDgKUFKG5Ek93I10eTAAAAAElFTkSuQmCC") 11 0, pointer;
+  /* old pixel cursors with a thick outline (assets/cursor-arrow-thick.png / cursor-hand-thick.png, inlined so the sign-in pop-up window gets them too);
+     big screens swap in the 1.5x versions, see scaleToScreen */
+  --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAqCAYAAACgLjskAAABQ0lEQVR4AazUgQ7CIAwEUM7//+fJzZiNcJSWNlmzWaBvl6if1tq1qN6uvwjWTzUmWuA/uXE8vmSB8WmOEx6wNKkHdLy3f8sEXtfVWGJESdIJFFBpawkyJUtoqaRLUEAlrS3IlCyhHSXdggJKtdwgU7KEFkrqBgV01AqDTMkSmitpGBRQqHUMMiVLaGbSY1BArlYaZEqW0GTSNCggs1UGMiVLaEPSMlBAslUOMiVLaHfSclBAQysNAmjAXIPy+pAGX7Ncj24Q+KVwTTU2uUFjRmhpCwLhZOhvsKwt2A+XXksQwP3tO9Du39vq3BJcHcj2JxCwkwHjOv9VWN4XmUDvwdN9HhB9OKvf8pcHzCuvCRbIVKzX9vyjBeaniwkEmUKV2P60ANy/U+B3f1bsJ4L2juLVCIhus/rNvLiHJTdFQDkg2vwCAAD//45/vA0AAAAGSURBVAMAKtBaTbxdmfcAAAAASUVORK5CYII=") 1 1, default;
+  --hand:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAqCAYAAADbCvnoAAABI0lEQVR4AeyUgQ7CIAxEOf//n7GQXEKBMXAwi9PQlNJars+5l+v/eCltmaSvrxFB12/r6NAjiFTO2vXWNfv0CGo2mJ0cFuS9d6l9XdBsAXm/YUJ5g9nxX9AZ0UcQ4vuI/gyKyj+CkJpYApLKvaTK9buE0rd32JezFydVYqYJ5YoZF6ONHARaqTW+G+8zSSgqayhfkiK1vLlJQkokldOrZCU4qhs9Z2v7hKiU/mhS5md7+4QAOACzB+/uZ5JQwBFMTQFAkbrrWTJJiGQgm2Di1FoSAFC/AC8xTYgilQfqk6iiOQGkDbYgFJWK2iULQPXZ4WVbEKJY5YH2ZKp4LICUBxPn3FaEIJKDibtvbUWoigVA/JcAn/lq0+Rwf0LJMEu25gi9AQAA//8nwQmPAAAABklEQVQDANdpeD31aaUOAAAAAElFTkSuQmCC") 13 0, pointer;
 }
 *{box-sizing:border-box}
 html,body{height:100%; overscroll-behavior:none} /* no rubber-band bounce past the top/bottom */
@@ -125,6 +126,13 @@ a{color:var(--royal)}
 #oath .fingerprint{position:absolute; right:calc(4*var(--uvw)); bottom:calc(4*var(--uvh)); z-index:6; width:58px; height:74px; border-radius:50% 50% 46% 46%;
   background:repeating-radial-gradient(ellipse at 50% 60%, transparent 0 3px, #fff 3px 5px); opacity:.85}
 #oath .flash{position:absolute; inset:0; background:var(--liver); opacity:0; pointer-events:none; z-index:10; transition:opacity .35s}
+/* the very first thing a visitor sees: a black screen with one big "shop?" button */
+#oath .gate{position:absolute; inset:0; z-index:10; background:#000; display:grid; place-items:center; transition:opacity .35s}
+#oath .gate.gone{opacity:0; pointer-events:none}
+#shop-q{font:clamp(36px,calc(4.5*var(--uvw)),72px)/1.1 var(--display); color:#fff; background:var(--meat); border:3px solid #fff; border-radius:999px;
+  padding:.05em .7em .15em; animation:beckon 1.8s ease-in-out infinite}
+#shop-q:hover{background:#e01535; animation-play-state:paused; scale:1.06}
+@keyframes beckon{50%{scale:1.05}}
 /* Opening: the intro line types in word by word on black, then flies up into place as the black dissolves */
 #oath .curtain{position:absolute; inset:0; z-index:8; background:#000; transition:opacity 1.3s ease 1.8s, filter 1.3s ease 1.8s}
 #oath.typing .intro{z-index:9}
@@ -152,7 +160,6 @@ nav.main{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:ce
 nav.main button, nav.main .searchbox{border:1px solid var(--ink); background:#fff; padding:6px 12px; font:13px/16px var(--sign); color:var(--ink); box-shadow:3px 3px 0 var(--ink)}
 nav.main button:hover{background:var(--yolk); transform:rotate(-2deg)}
 nav.main .plate-btn{background:var(--gum); color:#fff}
-nav.main .leave-btn{background:var(--ink); color:var(--yolk)} /* only shows once you have checked out */
 .searchbox{display:flex; align-items:center; gap:6px}
 .searchbox input{border:0; padding:0; font:13px/16px var(--sign); color:var(--ink); width:172px; outline:none; background:transparent}
 .searchbox input::placeholder{color:var(--ink); opacity:1}
@@ -196,7 +203,8 @@ nav.main .leave-btn{background:var(--ink); color:var(--yolk)} /* only shows once
 .cuts h2{margin:0 0 16px; font:66px/1.15 var(--drip); color:#ee1317; text-shadow:0 4px 0 #fff, 0 6px 0 #000}
 .trays{position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:48px 39px}
 .tray{position:relative; aspect-ratio:330/247; cursor:var(--hand); transition:transform .15s}
-.tray:hover{transform:translateY(-4px) rotate(-1deg)}
+.tray:not(.still):hover{transform:translateY(-4px) rotate(-1deg)}
+.tray.still{cursor:var(--arrow)} /* the small child is not for sale */
 .tray .art{position:absolute; left:calc(-20 / 330 * 100%); top:calc(var(--t,-6) / 247 * 100%); width:calc(370 / 330 * 100%); max-width:none; pointer-events:none}
 .label{position:absolute; left:calc(120 / 330 * 100%); top:calc(176 / 247 * 100%); width:calc(196 / 330 * 100%); z-index:2; background:#fff; border:1px solid #bababa;
   box-shadow:2px 3px 0 rgba(0,0,0,.18); padding:6px 8px; display:flex; flex-direction:column; gap:3px; transform:rotate(-3deg); color:var(--ink)}
@@ -317,6 +325,16 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 .pop .body{padding:12px; display:grid; gap:8px; text-align:center}
 .pop .big{font:22px/1.05 var(--sign); color:var(--meat)}
 .pop .cta{background:var(--slime); border:2px solid var(--ink); font:14px var(--sign); padding:8px}
+/* after checkout: a big window nudging the visitor out of the shop (see leaveNudge) */
+.leave-back{position:fixed; inset:0; z-index:70; background:rgba(22,17,14,.5); display:grid; place-items:center; padding:16px; animation:ssoIn .2s ease-out}
+.pop.leave-pop{position:relative; z-index:auto; width:min(640px,100%); box-shadow:10px 10px 0 rgba(0,0,0,.45)}
+.leave-pop .bar{font-size:14px; padding:6px 8px}
+.leave-pop .body{padding:28px 28px 22px; gap:14px}
+.leave-pop .big{font-size:clamp(28px,calc(3.2*var(--uvw)),44px)}
+.leave-pop p{margin:0; font:19px/1.4 var(--catalogue)}
+.leave-pop .go{justify-self:center; background:var(--gum); color:#fff; border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); font:clamp(24px,calc(2.6*var(--uvw)),34px) var(--sign); padding:14px 34px}
+.leave-pop .go:hover{transform:rotate(-2deg) scale(1.03)}
+.leave-pop .stay{justify-self:center; background:none; border:0; padding:2px; font:12px var(--bot); color:#555; text-decoration:underline}
 /* fake browser window — only shown if the real pop-up gets blocked */
 .ssowin{position:fixed; inset:0; z-index:90; background:#fff; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 18px 50px rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.25); animation:ssoIn .18s ease-out}
 @keyframes ssoIn{from{opacity:0; transform:translateY(10px) scale(.97)}}
@@ -461,15 +479,11 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .side-ad img{border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink)}
 
 /* ==================== 06  CONFIRMATION ==================== */
-#confirm-screen{background:#1d2a9e; color:#fff; min-height:calc(100*var(--uvh)); padding:30px 16px; text-align:center; position:relative; overflow:hidden}
-#confirm-screen .smile{width:min(360px,calc(80*var(--uvw))); margin:0 auto; border:5px solid #fff}
+#confirm-screen{background:#1d2a9e; color:#fff; min-height:calc(100*var(--uvh)); padding:30px 16px; text-align:center; position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:center; align-items:center}
+#confirm-screen[hidden]{display:none}
 #confirm-screen h1{font:clamp(34px,calc(5*var(--uvw)),64px)/1 var(--display); color:var(--yolk); margin:22px 0 8px; text-shadow:4px 4px 0 var(--ink)}
 #confirm-screen p{font:20px/1.45 var(--catalogue); max-width:56ch; margin:8px auto}
-.rocket{position:absolute; left:-120px; bottom:20%; font:40px var(--sign); color:var(--yolk); white-space:nowrap; animation:rocket 7s linear infinite}
-.rocket .ship{display:inline-block; width:90px; height:34px; background:linear-gradient(#fff,#bbb); border-radius:50% 70% 70% 50% / 50%; position:relative; vertical-align:middle; border:2px solid var(--ink)}
-.rocket .ship::before{content:""; position:absolute; left:-30px; top:6px; width:30px; height:18px; background:linear-gradient(90deg,transparent,var(--meat),var(--yolk)); border-radius:50%}
-.rocket .ship::after{content:""; position:absolute; right:16px; top:9px; width:12px; height:12px; border-radius:50%; background:var(--sky); border:2px solid var(--ink)}
-@keyframes rocket{0%{transform:translate(0,0) rotate(-8deg)}100%{transform:translate(calc(calc(100*var(--uvw)) + 260px),calc(-50*var(--uvh))) rotate(-22deg)}}
 
 /* fake inbox */
 .inbox{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px}
@@ -503,9 +517,12 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 // Big screens (the exhibition iMac): scale the whole shop up so it fills the screen like it does on a laptop.
 // Designed at about 1600×900 (laptops stay at 100%); never shrinks below 1.
 (function scaleToScreen(){
+  let big = false;
   const fit = () => {
     const z = Math.max(1, Math.min(innerWidth / 1600, innerHeight / 900, 1.8));
-    const r = document.documentElement; r.style.zoom = z.toFixed(3); r.style.setProperty("--z", z.toFixed(3));
+    const r = document.documentElement; r.style.zoom = z.toFixed(3); r.style.setProperty("--z", z.toFixed(3)); if (z > 1 !== big){ big = z > 1; // cursors don't zoom with the page, so the iMac gets bigger ones
+      r.style.setProperty("--arrow", big ? `url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA/CAYAAACW2FpzAAABi0lEQVR4AeyWga6DIAxFue///9lHTerc5i4FCgQ0scFJgeNps+0vhLAZIqaMvQR0LIHx9OVAz+1hdOCbtpxRXz0Fu5UYHdIGJaAFPuqXzA+6bVvQID66tcH8RonFIVMmo9oCMhLKpm1gAiVw3abWBZXyaxCd7m2wrlFiselUlVFtARkJpUsbVIESOPep+4FK+TWIzuI2uJ9RYtFlymo06zBtARnJwqw2aAJK4IqnHlBVJ+XX0GcXY7INHqMX1qoedTWqLSAjob5sg66gBC459YCmFEn5NUju0QaPUWKpaKq5UQAB4GEhbw5qgbDk3AMUeJXUYqUm5x5Gawzlrs02CriVGxHWHNmgcfMh11qgAI4vbUedx++4Zc+1jFreuHXOT6NAXrmBPX9vkTO0/pWT8fw89/4naO5GrfOXBkW0pxFv+1xLG+2j8OMUq1EttYwfW/T5aAXtQ0NOmQpUypkK8q7fUwD2L37gffzOtD+Zyqj9tQZm1hpFZNeIt1mXrpMxubAWNHmAV8I0oP8AAAD//1Km97wAAAAGSURBVAMAkg6HcxZ7QUEAAAAASUVORK5CYII=") 2 2, default` : "");
+      r.style.setProperty("--hand", big ? `url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADYAAAA/CAYAAACrSjsVAAABnklEQVR4AexXixKEIAhs7///uaNz7JiSosJEhxtNBlHYXe71mZ69Zjp+ZVL4O+MpsHeqvJElgDHSeOsxt8p8claVIAeFYpmJXlYzxeZ5nkqzFRFmwFoBkPIGMIkZr/5QzKsyUl2hmMSMV38oVkEZ/ruR2yapQjETGl+8xKNivC0lO1F08PQI7KBc/VYA03MlR5b+1iw++YS4c9qioZjIndONrWKSxNxfFcrSmqWpTLrWuQWmPO8/bGhgq3z+dUgV8lZNnv1zaMX2cAfwiIpxubl9FbPmrFUMr00ExoN6tANYVk3TNjm25RqKtWT/Tm5RMQATkOadi1ufEYG1Luyf/541NDAQJ3mSuR8Aim3p+RNyaMX2Eg3g2SoGwpQnmT4HgOJbg1e7Bcb3urYDWJYPOG+DHNtgBeX8zVCMmOhqHCn2k5TQLCstbQeA009CXuERMB7XnR3ASpIB19qjdIeBD3RHnmSmEYolHvp5ahXLUi9rF+i0wLoAw4v0AozXZGKbAQOwfoEC9vZVtGbAriauHR/AajNsfX8oZs1o7fu+AAAA///57jZIAAAABklEQVQDAEA/tFt+UXI+AAAAAElFTkSuQmCC") 19 0, pointer` : ""); }
   };
   fit(); addEventListener("resize", fit);
 })();
@@ -537,7 +554,6 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
     </button>
     <nav class="main" aria-label="Main">
       <label class="searchbox" for="search"><span aria-hidden="true">⌕</span><input id="search" placeholder="search for anything!" autocomplete="off"></label>
-      <button class="leave-btn" id="leave-btn" type="button" hidden>Leave shop</button>
       <button class="plate-btn" data-go="plate">“Cart” (<span id="plate-count">0</span>)</button>
     </nav>
   </header>
@@ -559,7 +575,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
       <div class="strip" id="promo-strip"></div>
     </section>
 
-    <section class="cuts" aria-label="Fresh cuts">
+    <section class="cuts" id="cuts" aria-label="Fresh cuts">
       <div class="wrap">
         <h2 id="cuts-title">Fresh Cuts!</h2>
         <div class="trays" id="trays"></div>
@@ -760,17 +776,27 @@ const ITEMS = [
    blurb:"It’s your good friend!", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffffff", letter:"P", tile:"tiles/goodfriend.jpg", tf:"25px/1.2 Smokum", r:0},
 ];
 
-// Fresh Cuts trays: art is exported from Figma (assets/cuts/trayN.png); t = how far the art pokes out above the tray
+// Fresh Cuts trays: art is exported from Figma (assets/cuts/trayN.png); t = how far the art pokes out above the tray.
+// Each tray (except the small child, which just sits there) is a product of its own, see CUT_ITEMS.
 const CUTS = [
-  {name:"Teeth, Assorted", art:"tray1", t:-43.9, wt:"0.42", sell:"YESTERDAY", pr:"9,999,999", link:"jaws"},
-  {name:"Eyes, Pair (Rental)", art:"tray2", wt:"0.07", sell:"WHEN THEY BLINK", pr:"1,499,999", link:"digicam", sticker:["tray2-sticker", -40.1, -4.9, 134.9]},
-  {name:"Small Child", art:"tray3", wt:"1.13", sell:"BEFORE IT ESCAPES", pr:"899,999", link:"lunch", sticker:["tray3-sticker", 201.3, -68.9, 174.9]},
-  {name:"Catch of the Day (Dry)", art:"tray4", wt:"0.88", sell:"IT’S TOO LATE", pr:"2,999,999", link:"lunch"},
-  {name:"Helping Hands", art:"tray5", wt:"0.03", sell:"NEVER", pr:"499,999", link:"modify"},
-  {name:"Mmm, Apple", art:"tray6", wt:"4.20", sell:"BEFORE IT DRIVES OFF", pr:"999,999", link:"happymaker"},
-  {name:"Bowl of Grapes", art:"tray7", wt:"4.20", sell:"GRAPES", pr:"5,999,999", link:"bonbons"},
-  {name:"Child’s Armchair, Toothless", art:"tray8", t:-6.9, wt:"4.20", sell:"BEFORE IT STANDS UP", pr:"5,999,999", link:"goodfriend"},
+  {id:"cut-teeth", name:"Teeth, Assorted", art:"tray1", t:-43.9, wt:"0.42", sell:"YESTERDAY", pr:"9,999,999",
+   tag:"Mixed sizes. Mixed owners.", desc:"A generous handful of loose teeth, rinsed and sorted by nobody. Molars, incisors, a canine or two. Perfect for replacing your own, or for keeping in a little dish by the door.", warn:"Do not count them. The number changes."},
+  {id:"cut-eyes", name:"Eyes, Pair (Rental)", art:"tray2", wt:"0.07", sell:"WHEN THEY BLINK", pr:"1,499,999", sticker:["tray2-sticker", -40.1, -4.9, 134.9],
+   tag:"See the world through someone else’s eyes!", desc:"One matching pair, gently pre-owned, delivered chilled. Your rental period ends when they blink. They will blink.", warn:"Return them the way you found them: open."},
+  {name:"Small Child", art:"tray3", wt:"1.13", sell:"BEFORE IT ESCAPES", pr:"899,999", sticker:["tray3-sticker", 201.3, -68.9, 174.9]}, // not for sale (not clickable)
+  {id:"cut-fish", name:"Catch of the Day (Dry)", art:"tray4", wt:"0.88", sell:"IT’S TOO LATE", pr:"2,999,999",
+   tag:"Caught this morning. Dried this afternoon.", desc:"A beautiful tropical fish, sun-dried for freshness. Still very colorful. Still looking at you.", warn:"Do not add water. It will remember the sea."},
+  {id:"cut-hands", name:"Helping Hands", art:"tray5", wt:"0.03", sell:"NEVER", pr:"499,999",
+   tag:"Many hands make light work!", desc:"A bundle of spare hands for chores, homework and holding on. Fingertips freshly painted. The previous owners were very hard-working.", warn:"Count your own hands after use."},
+  {id:"cut-apple", name:"Mmm, Apple", art:"tray6", wt:"4.20", sell:"BEFORE IT DRIVES OFF", pr:"999,999",
+   tag:"An apple a day!", desc:"A crisp red apple with a little driver inside. Keeps the doctor away, mostly by driving off with them.", warn:"Sell by: before it drives off. Please hurry."},
+  {id:"cut-grapes", name:"Bowl of Grapes", art:"tray7", wt:"4.20", sell:"GRAPES", pr:"5,999,999",
+   tag:"Grapes!", desc:"A heaping bowl of grapes on a pretty glass stand. Sweet. Juicy. Grape. These are grapes.", warn:"Grapes."},
+  {id:"cut-armchair", name:"Child’s Armchair, Toothless", art:"tray8", t:-6.9, wt:"4.20", sell:"BEFORE IT STANDS UP", pr:"5,999,999",
+   tag:"Sit. Stay.", desc:"A soft little armchair, just the right size for a small child. It has no teeth, so it can only hold on very gently.", warn:"Do not leave a child sitting in it overnight. It gets attached."},
 ];
+const CUT_ITEMS = CUTS.filter(c => c.id).map(c => ({id:c.id, name:c.name, price:+c.pr.replace(/,/g, ""), img:`cuts/${c.art}.png`,
+  tag:c.tag, blurb:c.tag, desc:c.desc, warn:c.warn, card:"#e6f6ff", isCut:true}));
 // stickers slapped across the tray grid (x, y, width in Figma px on the 1438×542 grid)
 const CUTS_STICKERS = [["cuts-sticker1", -16, -30.9, 132], ["cuts-sticker2", 991, 305.1, 180.3], ["cuts-sticker3", 265, 313.1, 128.7]];
 
@@ -792,6 +818,7 @@ const store = {
 };
 let plate = store.get("plate", []);
 let customer = store.get("customer", null); // {name, selfie} once consumed
+const findItem = id => [...allItems(), ...CUT_ITEMS].find(x => x.id === id);
 const allItems = () => [...(customer ? [youItem()] : []), ...pastItems(), ...ITEMS];
 const esc = s => String(s).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 // earlier customers saved on the kiosk computer (see kiosk archive below), listed back as products
@@ -850,8 +877,9 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
     if (rolling) return; rolling = true;
     const roll = $("#oath .roll"), last = $(".last", roll), swear = $("#oath .swear");
     let y = viewH(), prev = 0;
+    oathAmbience(true);
     (function frame(now){
-      if ($("#oath").hidden) return;
+      if ($("#oath").hidden) return oathAmbience(false);
       y -= ROLL_SPEED * (prev ? Math.min(.1, (now - prev) / 1000) : 0); prev = now;
       if (y < -roll.offsetHeight) y = viewH(); // gone off the top: start again from the bottom
       roll.style.transform = `translateY(${y}px)`;
@@ -864,7 +892,11 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
   (function opening(){
     const oathEl = $("#oath"), intro = $(".intro", oathEl);
     if (oathEl.hidden) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return startRoll();
+    const gate = document.createElement("div"); gate.className = "gate";
+    gate.innerHTML = `<button type="button" id="shop-q">shop?</button>`;
+    oathEl.append(gate);
+    const begin = then => { $("#shop-q").onclick = () => { gate.classList.add("gone"); setTimeout(() => gate.remove(), 400); then(); }; };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return begin(startRoll);
     // wrap each word (keeping the big <b>V</b> attached to "alued" and the line breaks where they are)
     const words = [];
     let cur = null;
@@ -909,11 +941,11 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
         setTimeout(() => { curtain.remove(); intro.hidden = true; oathEl.classList.remove("typing", "revealed"); }, 3300);
       }, 650);
     };
-    setTimeout(next, 700);
+    begin(() => setTimeout(next, 600)); // nothing happens until they click "shop?"
   })();
   function enter(){
     const oathEl = $("#oath"), flash = $(".flash", oathEl);
-    oathEl.classList.add("chomp"); sfx.chomp();
+    oathAmbience(false); oathEl.classList.add("chomp"); sfx.chomp();
     // the jaws slam shut, then the screen strobes red/black before the shop cuts in
     const beats = [60, 45, 70, 40, 55, 35, 80, 45, 40, 65, 50, 90];
     let k = 0;
@@ -976,7 +1008,7 @@ function renderHome(){
 // tray section
 const pct = (v, of) => `calc(${v} / ${of} * 100%)`;
 $("#trays").innerHTML = CUTS.map(c => `
-  <div class="tray" role="button" tabindex="0" data-go="item" data-arg="${c.link}" aria-label="${c.name}"${c.t ? ` style="--t:${c.t}"` : ""}>
+  <div class="tray${c.id ? "" : " still"}"${c.id ? ` role="button" tabindex="0" data-go="item" data-arg="${c.id}"` : ""} aria-label="${c.name}"${c.t ? ` style="--t:${c.t}"` : ""}>
     <img class="art" src="assets/cuts/${c.art}.png" alt="">
     ${c.sticker ? `<img class="sticker" src="assets/cuts/${c.sticker[0]}.png" alt="" style="left:${pct(c.sticker[1], 330)}; top:${pct(c.sticker[2], 247)}; width:${pct(c.sticker[3], 330)}">` : ""}
     <div class="label">
@@ -1099,11 +1131,11 @@ $("#faq-list").innerHTML = FAQ.map(([q,a]) => `<details><summary>${q}</summary><
 
 /* ============================================================ 03 PRODUCT */
 function renderItem(id){
-  const it = allItems().find(x => x.id === id) || ITEMS[0];
+  const it = findItem(id) || ITEMS[0];
   let qty = 1;
   const others = ITEMS.filter(x => x.id !== it.id).sort(() => Math.random()-.5).slice(0,4);
   $("#item").innerHTML = `
-    <div class="crumbs"><button data-go="home">Home</button> › <button data-go="home" data-scroll="products">Everyday Goodies</button> › ${it.name} › <span style="color:var(--meat)">you</span></div>
+    <div class="crumbs"><button data-go="home">Home</button> › ${it.isCut ? `<button data-go="home" data-scroll="cuts">Fresh Cuts</button>` : `<button data-go="home" data-scroll="products">Everyday Goodies</button>`} › ${it.name} › <span style="color:var(--meat)">you</span></div>
     <div class="pdp">
       <div class="stage halftone">
         <img class="lace" src="assets/lace-white.png" alt="">
@@ -1147,7 +1179,7 @@ function renderPlate(){
     $("#plate").innerHTML = `<div class="empty"><p style="font:46px var(--display);color:var(--meat)">Your plate is empty.</p><p>Your plate is empty. Your plate is empty. Your plate is empty.<br>That is unacceptable. <b>I can still see some vitality in your skin.</b></p><button class="btn" data-go="home" data-scroll="products">FILL IT</button></div>`;
     return;
   }
-  const items = plate.map(id => allItems().find(x => x.id === id)).filter(Boolean);
+  const items = plate.map(findItem).filter(Boolean);
   const total = items.reduce((a,b) => a + b.price, 0);
   const counts = {}; plate.forEach(id => counts[id] = (counts[id]||0) + 1);
   // spiral heap so items pile toward the middle
@@ -1161,7 +1193,7 @@ function renderPlate(){
       <div style="position:relative; padding-inline:30px"><div class="dinner"><span class="cutlery l"></span><span class="cutlery r"></span><div class="heap">${heap}</div></div></div>
       <div class="receipt">
         <h2>Your Plate</h2>
-        ${Object.entries(counts).map(([id,n]) => { const it = allItems().find(x => x.id===id); return `<div class="line"><span>${n} × ${it.name}</span><span>${won(it.price*n).replace(/<\/?sup>/g,"")}</span></div>` }).join("")}
+        ${Object.entries(counts).map(([id,n]) => { const it = findItem(id); return `<div class="line"><span>${n} × ${it.name}</span><span>${won(it.price*n).replace(/<\/?sup>/g,"")}</span></div>` }).join("")}
         <div class="line"><span>Processing fee</span><span>1 (one) soul</span></div>
         <div class="line"><span>Plate rental</span><span>₩9,999</span></div>
         <div class="tot"><span>TOTAL</span><span>${won(total + 9999)}</span></div>
@@ -1258,6 +1290,30 @@ function eyesFollow(e){
 // emergency alert alarm, synthesized: three bursts of the digital header screech,
 // then the two-tone attention signal (853 Hz + 960 Hz) until the face goes away
 let actx = null, alarm = null;
+// the oath's soundtrack: a bomb tick-tock that keeps speeding up (once a second at first, frantic after ~20 s,
+// then it stays frantic), with a wind chime now and then (all synthesized, kept quiet)
+const TICK_START = 1000, TICK_FASTEST = 140, TICK_SPEEDUP = .95; // ms; each tick comes 5% sooner than the last
+let ambT = 0, chimeT = 0;
+function oathAmbience(on){
+  clearTimeout(ambT); clearTimeout(chimeT); if (!on) return;
+  let n = 0, gap = TICK_START;
+  (function tick(){
+    const tock = n++ % 2, rush = 1 - (gap - TICK_FASTEST) / (TICK_START - TICK_FASTEST); // 0 calm → 1 frantic
+    hiss(.015, {freq:tock ? 3500 : 6000, vol:.13});
+    tone((tock ? 1250 : 1900) * (1 + rush * .25), .035, {type:"square", vol:.025 + rush * .015}); // a touch higher and louder as it rushes
+    gap = Math.max(TICK_FASTEST, gap * TICK_SPEEDUP);
+    ambT = setTimeout(tick, gap);
+  })();
+  const NOTES = [1568, 1760, 2093, 2349, 2637, 3136, 3520];
+  (function chime(){
+    chimeT = setTimeout(chime, rand(3500, 8000));
+    const k = 1 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < k; i++){
+      const f = pick(NOTES), at = i * rand(.08, .22);
+      tone(f, 2.6, {type:"sine", vol:.022, at}); tone(f * 2.76, 1.2, {type:"sine", vol:.006, at}); // a bell's off-key overtone
+    }
+  })();
+}
 function unlockAudio(){
   try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); }catch(e){ actx = null; }
 }
@@ -1326,6 +1382,12 @@ const sfx = {
   nav:   () => { tone(660, .06, {type:"triangle", vol:.14}); tone(990, .09, {type:"triangle", vol:.14, at:.06}); },
   up:    () => tone(500, .12, {type:"triangle", to:1400, vol:.14}),
   nope:  () => { tone(110, .24, {vol:.07}); tone(117, .24, {vol:.07}); },
+  victory: () => { // ta-da-da-DAAA: a rising arpeggio, then a big held chord
+    [[523, 0], [659, .11], [784, .22], [1047, .33]].forEach(([f, at]) => { tone(f, .16, {type:"square", vol:.06, at}); tone(f * 2, .12, {type:"triangle", vol:.05, at}); });
+    [784, 988, 1175, 1568].forEach(f => tone(f, 1.1, {type:"triangle", vol:.08, at:.5}));
+    [523, 659].forEach(f => tone(f, 1.1, {type:"square", vol:.035, at:.5}));
+    tone(1568, .6, {type:"sine", vol:.06, at:.5, to:2093});
+  },
   ching: () => { // ka-ching: drawer clack, then the bell twice
     hiss(.07, {freq:3000, vol:.3}); tone(140, .08, {vol:.1, to:60});
     [0, .13].forEach(at => { tone(1976, .8, {type:"sine", vol:.1, at:.07 + at}); tone(2637, .6, {type:"sine", vol:.07, at:.07 + at}); });
@@ -1355,7 +1417,7 @@ const sfx = {
 ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, unlockAudio, true));
 // every button clicks; a few get their own sound
 document.addEventListener("click", e => {
-  const b = e.target.closest("button, [data-go], .tray"); if (!b || b.disabled) return;
+  const b = e.target.closest("button, [data-go], .tray:not(.still)"); if (!b || b.disabled) return;
   if (b.matches("#hold, [data-sso]")) return; // these make their own noise
   if (b.matches("#add, #add2, [data-add]")) sfx.ching();
   else if (b.matches("#plus")) sfx.up();
@@ -1740,7 +1802,7 @@ function renderCheckout(){
         <img src="assets/zine-p7.jpg" alt="Select all images with NEW ITEM">
       </aside>
     </div>`;
-  const total = plate.map(id => allItems().find(x => x.id===id)).filter(Boolean).reduce((a,b)=>a+b.price,0);
+  const total = plate.map(findItem).filter(Boolean).reduce((a,b)=>a+b.price,0);
   $("#owed").textContent = total.toLocaleString("en-US");
   $$("[data-pay]").forEach(b => b.onclick = () => {
     payMode = b.dataset.pay; $$("[data-pay]").forEach(x => x.setAttribute("aria-pressed", x===b));
@@ -1841,6 +1903,7 @@ async function saveToInventory(c){
 function showConfirm(){
   stopAnnoyances();
   $("#shop").hidden = true; $("#confirm-screen").hidden = false; window.scrollTo(0,0);
+  setTimeout(sfx.victory, 350); // after the ka-ching from the CONSUME button
   setTimeout(showInbox, 4200);
 }
 function showInbox(){
@@ -1870,14 +1933,14 @@ function runVirus(){
       const f = document.createElement("div"); f.className = "final";
       f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
-        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances(); $("#leave-btn").hidden = false; }, 3200);
+        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances(); leaveNudge(); }, 3200);
     }
   }, 140);
 }
 
 /* ============================================================ farewell → fresh slate (gallery loop)
    After checkout, visitors can stay as long as they like (to try the filters on their listing). When they
-   click "Leave shop" (in the nav, shown only after checkout) the screen flickers black, thanks them, wipes
+   click "Leave shop" in the big window from leaveNudge() the screen flickers black, thanks them, wipes
    this visitor's traces (cart, listing, sign-in) and reloads to the blood oath for the next person. */
 const THANKS_MS = 3800;            // how long the thank-you stays up
 let farewellStarted = false;
@@ -1915,7 +1978,7 @@ const POPS = [
 ];
 let popT = null, popCount = 0;
 function spawnPop(){
-  if ($("#shop").hidden || document.body.classList.contains("gauntlet") || $$(".pop").length >= 2) return;
+  if ($("#shop").hidden || document.body.classList.contains("gauntlet") || $(".leave-back") || $$(".pop").length >= 2) return;
   const p = POPS[popCount++ % POPS.length], el = document.createElement("div"); el.className = "pop";
   el.style.left = rand(8, Math.max(10, viewW() - 340)) + "px"; el.style.top = rand(80, Math.max(90, viewH() - 220)) + "px";
   el.innerHTML = `<div class="bar"><span>${p.t}</span><button type="button" aria-label="Close">×</button></div><div class="body"><div class="big">${p.t}</div><div>${p.b}</div><button class="cta" type="button">${p.c}</button></div>`;
@@ -1925,8 +1988,31 @@ function spawnPop(){
   $(".cta", el).onclick = () => { el.remove(); go("item", p.go) };
   document.body.appendChild(el); sfx.pop();
 }
+// After checkout: a big window that keeps (politely) showing the visitor the door. "Leave shop" plays the
+// farewell and resets for the next person; "a little longer" closes it, and it comes back a bit later.
+const LEAVE_FIRST_MS = 15000, LEAVE_AGAIN_MS = 45000;
+let leaveT = 0;
+function leaveNudge(ms = LEAVE_FIRST_MS){
+  clearTimeout(leaveT);
+  leaveT = setTimeout(() => {
+    if ($("#shop").hidden || farewellStarted || $(".leave-back")) return leaveNudge(5000); // not now; try again shortly
+    const back = document.createElement("div"); back.className = "leave-back";
+    back.innerHTML = `<div class="pop leave-pop" role="dialog" aria-label="Leave the shop">
+      <div class="bar"><span>${BRAND} Customer Services</span><button type="button" aria-label="Close">×</button></div>
+      <div class="body">
+        <div class="big">YOU HAVE SHOPPED ENOUGH!</div>
+        <p>Your purchase is complete. You are now in stock.<br>Please make room for the next customer.</p>
+        <button class="go" type="button">LEAVE SHOP</button>
+        <button class="stay" type="button">let me look a little longer</button>
+      </div></div>`;
+    const close = () => { back.remove(); leaveNudge(LEAVE_AGAIN_MS); };
+    $(".go", back).onclick = () => { back.remove(); farewell(); };
+    $(".stay", back).onclick = close; $(".bar button", back).onclick = close;
+    document.body.appendChild(back); sfx.pop();
+  }, ms);
+}
 function startAnnoyances(){ stopAnnoyances(); popT = setInterval(spawnPop, 45000); setTimeout(spawnPop, 20000); }
-function stopAnnoyances(){ clearInterval(popT); $$(".pop").forEach(p => p.remove()); }
+function stopAnnoyances(){ clearInterval(popT); $$(".pop:not(.leave-pop)").forEach(p => p.remove()); }
 
 /* ============================================================ "Sign in with BRAND" window
    Like Google sign-in: opens a real, separate browser window. If the browser
@@ -2072,7 +2158,7 @@ function ask(q){
 /* ============================================================ boot */
 // dev controls only show when the shop runs on this computer (localhost), never on the public site
 if (!["localhost", "127.0.0.1"].includes(location.hostname)) ["#dev-skip", "#dev-music", "#test-sso"].forEach(s => $(s).style.display = "none");
-$("#leave-btn").hidden = !customer?.variants; $("#leave-btn").onclick = farewell; // "Leave shop" appears after checkout
+if (customer?.variants) leaveNudge(); // already checked out (e.g. the page was reloaded): keep nudging them out
 loadPast();
 if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
 // jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
