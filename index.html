@@ -939,7 +939,8 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
       // all typed: wait for "proceed" (that click is also what lets the sound start)
       const go = document.createElement("button"); go.type = "button"; go.id = "oath-go"; go.textContent = "proceed";
       oathEl.append(go); setTimeout(() => go.classList.add("show"), 400);
-      go.onclick = () => { go.classList.remove("show"); setTimeout(() => go.remove(), 600); fly(); };
+      go.addEventListener("pointerdown", stopMusic); // silence before the click lets any sound through
+      go.onclick = () => { stopMusic(); go.classList.remove("show"); setTimeout(() => go.remove(), 600); fly(); };
     };
     const fly = () => {
       setTimeout(() => {
@@ -970,7 +971,7 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
     }, 150);
   }
   function showShop(){
-    $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; startMusic(); store.set("sworn", true); go("home"); startAnnoyances();
+    $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; startMusic(true); store.set("sworn", true); go("home"); startAnnoyances();
   }
 })();
 
@@ -1565,16 +1566,24 @@ function applyTrackFx(){
   vinyl.trim.gain.setTargetAtTime(10 ** ((fx.gain || 0) / 20), t, .02);
   vinyl.wet.gain.setTargetAtTime(wet, t, .05); vinyl.dry.gain.setTargetAtTime(dry, t, .05);
 }
-function startMusic(){
+// fromTop: start over from track 1 (ENA, the entrance music) — used when someone enters the shop
+function startMusic(fromTop = false){
   if (musicOn) return; musicOn = true;
+  if (fromTop){ track = 0; music.src = PLAYLIST[0]; showTrack(); applyTrackFx(); }
   if (!music.src) music.src = PLAYLIST[track];
   vinylChain();
-  // browsers only allow sound after a click; if there hasn't been one yet (a #home link), wait for it
+  // browsers only allow sound after a click; if there hasn't been one yet, wait for it
+  // (but not if that click is "proceed", which silences the music anyway)
   music.play().catch(() => {
-    const retry = () => { if (!musicOn) return; vinylChain(); music.play().catch(() => {}); };
-    ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, retry, {once:true}));
+    const retry = e => {
+      if (musicOn && e.target.closest?.("#oath-go")) return;
+      ["pointerdown", "keydown"].forEach(ev => document.removeEventListener(ev, retry));
+      if (!musicOn) return; vinylChain(); music.play().catch(() => {});
+    };
+    ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, retry));
   });
 }
+function stopMusic(){ musicOn = false; music.pause(); }
 let musicHeld = false; // true while the music is paused on purpose (the jumpscare)
 function pauseMusic(){ musicHeld = true; music.pause(); }
 // dev: mute only the music (sound effects keep playing); remembered across reloads
@@ -2174,8 +2183,13 @@ if (!["localhost", "127.0.0.1"].includes(location.hostname)) ["#dev-skip", "#dev
 loadPast();
 if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
 // jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
-function skipToShop(){ $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; go("home"); startAnnoyances(); startMusic(); }
+function skipToShop(){ $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; go("home"); startAnnoyances(); stopMusic(); startMusic(true); }
 if (location.hash === "#home" || location.hash === "#skip") skipToShop();
-else renderHome();
+else {
+  renderHome();
+  // the welcome screen gets the soundtrack too, minus the entrance music (ENA is saved for entering the shop).
+  // Browsers hold sound back until the first click unless Chrome is started with --autoplay-policy=no-user-gesture-required
+  unlockAudio(); track = 1; showTrack(); applyTrackFx(); startMusic();
+}
 updateCount();
 </script>
