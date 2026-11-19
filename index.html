@@ -409,10 +409,12 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 
 /* ==================== 03  PRODUCT PAGE ==================== */
 .pdp{display:grid; grid-template-columns:1fr 1fr; gap:36px; padding-block:30px; align-items:start}
-.pdp .stage{position:relative; aspect-ratio:1; background:var(--meat); border:4px solid var(--ink); display:grid; place-items:center; overflow:hidden}
-.pdp .stage .lace{position:absolute; inset:2%; width:96%; height:96%; object-fit:contain; opacity:.95}
-.pdp .stage .hero-img{position:relative; max-width:48%; max-height:48%; object-fit:contain; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,.4))}
-.pdp .stage .pend{z-index:2; width:44%}
+/* product stage (Figma "Product Page" 311:5): one of three palettes (pink/yellow/orange: gradient + starburst + logo colour, see STAGE),
+   the product cut out with its own "2" shadow layer sitting on the star, and the AMALGAM badge in the corner */
+.pdp .stage{position:relative; aspect-ratio:1; background:#fffced var(--bg) center/cover no-repeat; border:4px solid var(--ink); overflow:hidden}
+.pdp .stage .hero-img{position:absolute; left:51.5%; top:53.5%; translate:-50% -50%; max-width:58%; max-height:56%; object-fit:contain; z-index:2}
+.pdp .stage .pend{position:absolute; left:51.5%; top:53.5%; translate:-50% -50%; z-index:2; width:44%}
+.pdp .stage .stage-logo{position:absolute; top:3.7%; right:4.2%; width:18.4%; z-index:3}
 .pdp h1{margin:0; font:clamp(40px,calc(5*var(--uvw)),72px)/.95 var(--display); color:var(--royal); -webkit-text-stroke:1.5px var(--ink); text-shadow:4px 4px 0 #fff}
 .pdp .tagline{font:italic 22px var(--catalogue); color:var(--meat); margin:8px 0 14px}
 .pdp .prices{display:flex; gap:16px; align-items:baseline; flex-wrap:wrap; font-size:52px}
@@ -1171,6 +1173,15 @@ const FAQ = [
 $("#faq-list").innerHTML = FAQ.map(([q,a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join("");
 
 /* ============================================================ 03 PRODUCT */
+// product-page stage palette per product (pink = yellow star + green logo, yellow = cyan star + blue logo, orange = red star + red logo).
+// Each listed product has a cut-out in assets/stage/<id>.webp (product + its shadow layer, no background).
+const STAGE = {
+  happymaker:"pink", digicam:"pink", teddy:"pink", lunch:"pink", moretime:"pink",
+  bonbons:"yellow", jaws:"yellow", goodfriend:"yellow", caterpillars:"yellow", modify:"yellow",
+  postit:"orange", nepotism:"orange", bathtub:"orange", petcat:"orange", poreless:"orange" };
+const PALETTES = ["pink", "yellow", "orange"];
+// Fresh Cuts, "It's You!" and Pre-Owned listings keep their own image and take a palette by position
+const stageOf = it => STAGE[it.id] || PALETTES[[...String(it.id)].reduce((n, ch) => n + ch.charCodeAt(0), 0) % 3];
 function renderItem(id){
   const it = findItem(id) || ITEMS[0];
   let qty = 1;
@@ -1178,10 +1189,9 @@ function renderItem(id){
   $("#item").innerHTML = `
     <div class="crumbs"><button data-go="home">Home</button> › ${it.isCut ? `<button data-go="home" data-scroll="cuts">Fresh Cuts</button>` : `<button data-go="home" data-scroll="products">Everyday Goodies</button>`} › ${it.name} › <span style="color:var(--meat)">you</span></div>
     <div class="pdp">
-      <div class="stage halftone">
-        <img class="lace" src="assets/lace-white.png" alt="">
-        ${imgFor(it, "hero-img")}
-        <img class="drift" src="assets/${pick(["clown.png","bluetang.png","angelfish.png"])}" alt="" style="left:6%;bottom:8%;width:22%;--r:6deg">
+      <div class="stage" style="--bg:url(assets/stage/bg-${stageOf(it)}.jpg)">
+        ${STAGE[it.id] ? `<img class="hero-img" src="assets/stage/${it.id}.webp" alt="${it.name}">` : imgFor(it, "hero-img")}
+        <img class="stage-logo" src="assets/stage/logo-${stageOf(it)}.svg" alt="AMALGAM">
       </div>
       <div>
         <h1>${it.name}</h1>
