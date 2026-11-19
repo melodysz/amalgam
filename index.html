@@ -380,7 +380,9 @@ footer p{margin:0 0 6px; font:15px/1.4 var(--catalogue)}
 .ups-sure{display:flex; flex-wrap:wrap; gap:2px 14px; margin:12px 0 6px; font-family:var(--sign); color:var(--royal); line-height:1.15}
 .ups-sure span{display:inline-block; transform:rotate(var(--r))}
 .ups-line{font:italic clamp(22px,calc(2.4*var(--uvw)),32px)/1.3 var(--catalogue); margin:10px 0 0; min-height:1.3em}
-.ups .card{cursor:default}
+.ups-sure:empty, .ups-line:empty{display:none} /* first page has no "Are you sure?"s or line yet, so no blank gap under the title */
+#upsell .section-title{margin-top:24px}
+.ups .card{cursor:var(--arrow)} /* not clickable here, but keep the custom arrow, not the system one */
 .ups .card .btn{font-size:14px; padding:8px 12px; box-shadow:3px 3px 0 var(--ink)}
 .notsure{background:none; border:0; padding:0; font:13px var(--bot); color:#666; text-decoration:underline}
 .gauntlet-bar{position:fixed; left:50%; bottom:calc(16px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); z-index:67;
@@ -552,6 +554,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
       <span class="wordmark" id="brand">AMALGAM Shopping Network</span>
     </button>
     <nav class="main" aria-label="Main">
+      <button data-go="home" data-scroll="cuts">Products</button>
       <label class="searchbox" for="search"><span aria-hidden="true">⌕</span><input id="search" placeholder="search for anything!" autocomplete="off"></label>
       <button class="plate-btn" data-go="plate">“Cart” (<span id="plate-count">0</span>)</button>
     </nav>
@@ -1811,7 +1814,6 @@ function renderCheckout(){
               <label for="selfie-file" style="font:12px var(--bot)">…or upload one:</label>
               <input type="file" id="selfie-file" accept="image/*" capture="user">
               <span class="hint" id="cam-hint">Please smile. Please smile more. Please hold that.</span>
-              <span style="font:10px var(--bot); color:#777; max-width:34ch">By submitting, your photo is saved to the shop’s inventory as part of this art project.</span>
             </div>
           </div>
         </fieldset>
