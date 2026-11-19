@@ -233,6 +233,11 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .card .ph{aspect-ratio:238/240; display:grid; place-items:center; background:var(--ph,#fff6); overflow:hidden; position:relative}
 .card .ph img{max-height:92%; object-fit:contain}
 .card .ph img.tile{width:100%; height:100%; max-height:none; object-fit:cover}
+/* pop-out cards (Caterpillars, Happy Maker, Good Friend, More Time): art spills past the photo box like in the Figma */
+.card .ph.popout{overflow:visible; display:block}
+.card .ph img.popart{position:absolute; max-height:none; height:auto; pointer-events:none}
+.card:has(.ph.popout.clip){overflow:hidden} /* these three are cropped at the card edge in the Figma; Happy Maker's bubble pokes out */
+.card:has(.ph.popout) .txt{position:relative; z-index:2} /* text sits over the art, as in the Figma */
 /* corner letter badge, as in the Figma cards */
 .card .letter{position:absolute; left:8px; top:12px; z-index:1; min-width:24px; height:34px; padding:0 3px; border-radius:10px; border:.8px solid #000; background:#fbf5ee;
   box-shadow:2px 4px 0 #000; font:20px/33px "Xanh Mono", monospace; letter-spacing:-.03em; color:#000; text-align:center}
@@ -483,6 +488,17 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 #confirm-screen[hidden]{display:none}
 #confirm-screen h1{font:clamp(34px,calc(5*var(--uvw)),64px)/1 var(--display); color:var(--yolk); margin:22px 0 8px; text-shadow:4px 4px 0 var(--ink)}
 #confirm-screen p{font:20px/1.45 var(--catalogue); max-width:56ch; margin:8px auto}
+
+/* waiting screens: a filling bar + a ticking countdown, so a screen that sits still never looks frozen (see waitUI) */
+.waitbar{width:min(460px,80%); height:22px; border:3px solid var(--ink); background:#fff; margin:22px auto 8px; overflow:hidden}
+.waitbar i{display:block; height:100%; width:0; background:repeating-linear-gradient(-45deg,var(--meat) 0 12px,var(--yolk) 12px 24px);
+  background-size:34px 34px; animation:waitfill var(--ms) linear forwards, waitstripes .6s linear infinite}
+@keyframes waitfill{to{width:100%}}
+@keyframes waitstripes{to{background-position:34px 0}}
+.waitnote{font:15px/1.3 var(--bot); color:#fff; min-height:1.3em; text-align:center}
+#thanks .wait{position:absolute; left:0; right:0; bottom:14%; opacity:0; transition:opacity .6s}
+#thanks .wait.on{opacity:1}
+#thanks .waitnote{color:#ff8fa3}
 
 /* fake inbox */
 .inbox{position:fixed; inset:0; z-index:70; background:rgba(0,0,0,.55); display:grid; place-items:center; padding:16px}
@@ -746,7 +762,7 @@ const ITEMS = [
   {id:"bathtub", name:"Blood Bathtub", price:29999999, was:31999999, img:"blood-bathtub.png", tag:"An amazing elixir of youth!",
    blurb:"Re-experience the vitality of youth!", desc:"For use, fill it up with at least 5.5 liters of blood from a sentient being of intelligence. ^^ Bring your own sentient being.", warn:"Do not drain into municipal pipes. The pipes remember.", card:"#ffe3ea", letter:"A", tile:"tiles/bathtub.jpg", tf:"25px/1.2 Smokum", r:0},
   {id:"caterpillars", name:"Fat-Sucking Caterpillars", price:8999999, was:12999999, img:"caterpillar.png", tag:"Watch Your Fat Slide Clean Off!",
-   blurb:"A diet supplement to get you back on track!", desc:"It is truly a diet supplement made by the devil, a bug that eats fat: the Aesthetic Caterpillar Egg Cluster! Just take it with water after a meal, and that's it. If you buy now, at this record-breaking special price, we'll even send you a single Happy Maker as a free gift!", warn:"Caterpillars do not know when to stop.", card:"#e9ffe0", letter:"B", tile:"tiles/caterpillars.jpg", tf:"20px/1.2 'Irish Grover'", r:0},
+   blurb:"A diet supplement to get you back on track!", desc:"It is truly a diet supplement made by the devil, a bug that eats fat: the Aesthetic Caterpillar Egg Cluster! Just take it with water after a meal, and that's it. If you buy now, at this record-breaking special price, we'll even send you a single Happy Maker as a free gift!", warn:"Caterpillars do not know when to stop.", card:"#e9ffe0", letter:"B", tile:"tiles/caterpillars.jpg", ph:"#e9a3df", pop:{src:"tiles/caterpillars-pop.webp", l:-5.46, t:5.18, w:110.08, clip:1}, tf:"20px/1.2 'Irish Grover'", r:0},
   {id:"bonbons", name:"Mind-Melting Bonbons", price:4999999, img:"i72729.png", tag:"Got memories you’d like to trash?",
    blurb:"Regrets keep you up late at night?", desc:"One bonbon removes one memory of your choosing. Two bonbons remove one memory of OUR choosing. Individually wrapped for freshness.", warn:"May contain traces of your childhood.", card:"#fff0f7", letter:"C", tile:"tiles/bonbons.jpg", tf:"20px/1.2 Sofia", r:1.2},
   {id:"postit", name:"Unlucky Post-It", price:999999, pend:"postit", pendText:"you know what you did", tag:"A curse item.",
@@ -754,7 +770,7 @@ const ITEMS = [
   {id:"teddy", name:"Happy Ending Teddy", price:19999999, img:"happy-ending-teddy.png", tag:"1999 LIMITED EDITION.",
    blurb:"Have you ever wanted to end it nicely?", desc:"Soft, huggable, and stuffed with something warm. It grants the Ending of Life! A peaceful slumber!", warn:"Do not discard. Neglectful owners will be visited.", card:"#f5e6d6", letter:"E", tile:"tiles/teddy.jpg", tf:"19px/1.25 Shrikhand", r:0},
   {id:"happymaker", name:"Happy Maker", price:27999999, pend:"pill", pendText:"HAPPY :)", tag:"Rapid pain elimination!",
-   blurb:"Drink for a smile!", desc:"An item that causes rapid pain elimination! In times of irreversible situations, it can be used for euthanasia. Ask your doctor if Happy Maker is right for you. Your doctor is not available.", warn:"Do not operate heavy machinery, or a body.", card:"#e2f3ff", letter:"F", tile:"tiles/happymaker.jpg", tf:"30px/25px Dokdo", r:1.2},
+   blurb:"Drink for a smile!", desc:"An item that causes rapid pain elimination! In times of irreversible situations, it can be used for euthanasia. Ask your doctor if Happy Maker is right for you. Your doctor is not available.", warn:"Do not operate heavy machinery, or a body.", card:"#e2f3ff", letter:"F", tile:"tiles/happymaker.jpg", ph:"#6fb7ff", pop:{src:"tiles/happymaker-pop.webp", l:27.31, t:12.04, w:86.13}, tf:"30px/25px Dokdo", r:1.2},
   {id:"nepotism", name:"Nepotism", price:13999999, tag:"It runs in the family.",
    blurb:"We know you want it!", desc:"A luxury fragrance in a heart-shaped bottle. One spritz and doors open, chairs pull out, and somebody’s uncle makes a call. Smells like an inheritance.", warn:"Do not wear to a job you intend to earn.", card:"#ffffff", letter:"G", tile:"tiles/nepotism.jpg", tf:"25px/1.3 'Pinyon Script'", r:-1.2},
   {id:"modify", name:"Make Your Ideal Self Kit", price:34999999, img:"i33110.png", tag:"Modify!",
@@ -768,11 +784,11 @@ const ITEMS = [
   {id:"poreless", name:"Poreless", price:7999999, pend:"box", pendText:"PORELESS<small>10,000,000 termite eggs</small>", tag:"Tired of your face?",
    blurb:"Your new glam—smooth as shaved wood!", desc:"Fill up your flaws with our PRODUCT: 10 million termite eggs! You’ll be as smooth as shaved wood!", warn:"For external use only. They will not stay external.", card:"#f6f0e0", letter:"M", tile:"tiles/poreless.jpg", tf:"bold 25px/1.2 'Snell Roundhand'", r:-1.2},
   {id:"moretime", name:"More Time", price:9999999, tag:"Tick tock!",
-   blurb:"There’s never enough.", desc:"A cat clock whose eyes follow the minutes as they leave. Every hour you spend looking at it is added to your plate.", warn:"Time purchased is non-refundable.", card:"#e8fff6", letter:"N", tile:"tiles/moretime.jpg", tf:"19px/1.25 Bungee", r:0},
+   blurb:"There’s never enough.", desc:"A cat clock whose eyes follow the minutes as they leave. Every hour you spend looking at it is added to your plate.", warn:"Time purchased is non-refundable.", card:"#e8fff6", letter:"N", tile:"tiles/moretime.jpg", ph:"#5fd3b0", pop:{src:"tiles/moretime-pop.webp", l:20.73, t:-4.62, w:80.67, clip:1}, tf:"19px/1.25 Bungee", r:0},
   {id:"jaws", name:"Clacky Jaws", price:3999999, tag:"Wind them up. Let them go.",
    blurb:"Wore out your old set? No problem!", desc:"A fresh set of wind-up chompers. Wear them, keep them on the nightstand, or let them walk around the house at night.", warn:"Keep fingers clear of the clacking.", card:"#fff8ec", letter:"O", tile:"tiles/jaws.jpg", tf:"25px/1.2 'Irish Grover'", r:1.2},
   {id:"goodfriend", name:"Good Friend", price:15999999, img:"good-friend.png", tag:"It’s your cute animal doll!",
-   blurb:"It’s your good friend!", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffffff", letter:"P", tile:"tiles/goodfriend.jpg", tf:"25px/1.2 Smokum", r:0},
+   blurb:"It’s your good friend!", desc:"It’s your cute animal doll! Invite someone from the Otherworld to dwell in the doll. It will always be with you and protect you. Always. :)", warn:"Do not ask who moved in. They will tell you.", card:"#ffffff", letter:"P", tile:"tiles/goodfriend.jpg", ph:"#53b44c", pop:{src:"tiles/goodfriend-pop.webp", l:-3.36, t:6.72, w:104.48, clip:1}, tf:"25px/1.2 Smokum", r:0},
 ];
 
 // Fresh Cuts trays: art is exported from Figma (assets/cuts/trayN.png); t = how far the art pokes out above the tray.
@@ -849,9 +865,11 @@ const youItem = () => {
 const youBase = (meta, selfie) => ({id:"you", name:meta.name, price:1, img:null, selfie, isYou:true, tag:meta.tag,
   blurb:`Freshly listed: ${customer.name || "a customer"}.`, desc:`A bipedal primate in its 20s (probably). Gently used. Includes one (1) email address, one (1) blood type, and all past injuries. Recently purchased something on this website.`, warn:"This item is already in your cart. This item is the cart.", card:"var(--gum)"});
 const cardStyle = (it, i = 0) => `--r:${it.r ?? (i % 3 - 1) * 1.2}deg;--card:${it.card}${it.tf ? `;--tf:${it.tf}` : ""}`;
-const cardBody = it => `
+const cardBody = it => it.pop ? `
+  <div class="ph popout${it.pop.clip ? " clip" : ""}" style="--ph:${it.ph}"><img class="popart" src="assets/${it.pop.src}" alt="${it.name}" style="left:${it.pop.l}%;top:${(it.pop.t * 238 / 240).toFixed(2)}%;width:${it.pop.w}%">${it.letter ? `<span class="letter">${it.letter}<i>.</i></span>` : ""}</div>${cardText(it)}` : `
   <div class="ph${it.tile ? "" : " halftone"}">${it.tile ? `<img class="tile" src="assets/${it.tile}" alt="${it.name}">` : imgFor(it)}${it.letter ? `<span class="letter">${it.letter}<i>.</i></span>` : ""}</div>
-  <div class="txt"><h3>${it.name}</h3>${it.blurb ? `<p class="blurb">${it.blurb}</p>` : ""}<div class="tag-price"><span class="w">₩</span>${it.price.toLocaleString("en-US")}</div></div>`;
+  ${cardText(it)}`;
+const cardText = it => `<div class="txt"><h3>${it.name}</h3>${it.blurb ? `<p class="blurb">${it.blurb}</p>` : ""}<div class="tag-price"><span class="w">₩</span>${it.price.toLocaleString("en-US")}</div></div>`;
 const imgFor = (it, cls="") => it.isYou || it.isPast
   ? `<img class="${cls}" src="${it.selfie || it.photo}" alt="${it.isYou ? "You" : it.name}" style="border:4px solid #fff;aspect-ratio:1;object-fit:cover;box-shadow:4px 4px 0 var(--ink)">`
   : it.tile ? `<img class="${cls}" src="assets/${it.tile}" alt="${it.name}">` // Figma card art first, so the product page + plate match the card
@@ -1930,11 +1948,26 @@ async function saveToInventory(c){
 }
 
 /* ============================================================ 06 CONFIRM → 07 EMAIL → VIRUS → home */
+// a filling bar + "… in 3…" countdown for screens that wait on a timer; steps (optional) rotate as the bar fills
+function waitUI(ms, label, steps){
+  const w = document.createElement("div"); w.className = "wait";
+  w.innerHTML = `<div class="waitbar" style="--ms:${ms}ms"><i></i></div><div class="waitnote"></div>`;
+  const note = $(".waitnote", w), t0 = performance.now();
+  const tick = () => {
+    const left = Math.max(0, ms - (performance.now() - t0));
+    const step = steps ? steps[Math.min(steps.length - 1, Math.floor((1 - left / ms) * steps.length))] + " · " : "";
+    note.textContent = `${step}${label} ${Math.max(1, Math.ceil(left / 1000))}…`;
+    if (left > 0) setTimeout(tick, 100);
+  };
+  tick(); return w;
+}
 function showConfirm(){
   stopAnnoyances();
   $("#shop").hidden = true; $("#confirm-screen").hidden = false; window.scrollTo(0,0);
   setTimeout(sfx.victory, 350); // after the ka-ching from the CONSUME button
-  setTimeout(showInbox, 4200);
+  $("#confirm-screen .wait")?.remove();
+  $("#confirm-screen").append(waitUI(5000, "check your inbox in", ["Packing your order", "Locating you", "Out for delivery", "Almost at your door"]));
+  setTimeout(showInbox, 5000);
 }
 function showInbox(){
   const box = $("#inbox"); box.hidden = false;
@@ -1961,9 +1994,10 @@ function runVirus(){
     $("i", w).style.transition = "width 1s"; i++; sfx.err();
     if (i > 26){ clearInterval(iv); sfx.ching();
       const f = document.createElement("div"); f.className = "final";
-      f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
+      f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.</div>`; v.appendChild(f);
+      f.firstElementChild.append(waitUI(3000, "returning you to the store in"));
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
-        setTimeout(() => jumpTo("products", true), 300); startAnnoyances(); leaveNudge(); }, 3200);
+        setTimeout(() => jumpTo("products", true), 300); startAnnoyances(); leaveNudge(); }, 3000);
     }
   }, 140);
 }
@@ -1972,7 +2006,7 @@ function runVirus(){
    After checkout, visitors can stay as long as they like (to try the filters on their listing). When they
    click "Leave shop" in the big window from leaveNudge() the screen flickers black, thanks them, wipes
    this visitor's traces (cart, listing, sign-in) and reloads to the blood oath for the next person. */
-const THANKS_MS = 3800;            // how long the thank-you stays up
+const THANKS_MS = 4000;            // how long the thank-you stays up (with a countdown)
 let farewellStarted = false;
 
 async function farewell(){
@@ -1987,6 +2021,7 @@ async function farewell(){
   setTimeout(() => o.classList.add("say"), 250);
   // make sure this visitor's selfie reached the archive before their traces are wiped
   if (customer?.variants && !customer.invId) await Promise.race([saveToKiosk(customer), new Promise(r => setTimeout(r, 4000))]);
+  const w = waitUI(THANKS_MS, "the shop resets for the next customer in"); o.append(w); requestAnimationFrame(() => w.classList.add("on"));
   await new Promise(r => setTimeout(r, THANKS_MS));
   freshSlate();
 }
@@ -2191,6 +2226,10 @@ loadPast();
 if (customer?.variants && !customer.invId) saveToKiosk(customer); // a checkout that never reached the archive (server was off)
 // jump past the opening and the oath straight to the shop (#home / #skip links, or the dev button)
 function skipToShop(){ $("#oath").hidden = true; $("#dev-skip").hidden = true; $("#shop").hidden = false; go("home"); startAnnoyances(); stopMusic(); startMusic(true); }
+// secret: on the public site, triple-click anywhere on the opening "proceed" screen to skip the oath
+// (not on the kiosk, where impatient visitors click a lot)
+if (!["localhost", "127.0.0.1"].includes(location.hostname))
+  $("#oath").addEventListener("click", e => { if (e.detail === 3 && $("#oath").classList.contains("typing")) skipToShop(); });
 if (location.hash === "#home" || location.hash === "#skip") skipToShop();
 else {
   renderHome();
