@@ -409,7 +409,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 
 /* ==================== 03  PRODUCT PAGE ==================== */
 .pdp{display:grid; grid-template-columns:1fr 1fr; gap:36px; padding-block:30px; align-items:start}
-/* product stage (Figma "Product Page" 311:5): one of three palettes (pink/yellow/orange: gradient + starburst + logo colour, see STAGE),
+/* product stage (Figma "Product Page" 311:5): one of three palettes (pink/blue/orange: gradient + starburst + logo colour, see STAGE),
    the product cut out with its own "2" shadow layer sitting on the star, and the AMALGAM badge in the corner */
 .pdp .stage{position:relative; aspect-ratio:1; background:#fffced var(--bg) center/cover no-repeat; border:4px solid var(--ink); overflow:hidden}
 .pdp .stage .hero-img{position:absolute; left:51.5%; top:53.5%; translate:-50% -50%; max-width:58%; max-height:56%; object-fit:contain; z-index:2}
@@ -1173,13 +1173,13 @@ const FAQ = [
 $("#faq-list").innerHTML = FAQ.map(([q,a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join("");
 
 /* ============================================================ 03 PRODUCT */
-// product-page stage palette per product (pink = yellow star + green logo, yellow = cyan star + blue logo, orange = red star + red logo).
+// product-page stage palette per product (pink = yellow star + green logo, blue = yellow star + yellow logo, orange = red star + red logo).
 // Each listed product has a cut-out in assets/stage/<id>.webp (product + its shadow layer, no background).
 const STAGE = {
   happymaker:"pink", digicam:"pink", teddy:"pink", lunch:"pink", moretime:"pink",
-  bonbons:"yellow", jaws:"yellow", goodfriend:"yellow", caterpillars:"yellow", modify:"yellow",
+  bonbons:"blue", jaws:"blue", goodfriend:"blue", caterpillars:"blue", modify:"blue",
   postit:"orange", nepotism:"orange", bathtub:"orange", petcat:"orange", poreless:"orange" };
-const PALETTES = ["pink", "yellow", "orange"];
+const PALETTES = ["pink", "blue", "orange"];
 // Fresh Cuts, "It's You!" and Pre-Owned listings keep their own image and take a palette by position
 const stageOf = it => STAGE[it.id] || PALETTES[[...String(it.id)].reduce((n, ch) => n + ch.charCodeAt(0), 0) % 3];
 function renderItem(id){
