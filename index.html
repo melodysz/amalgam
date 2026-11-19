@@ -122,6 +122,7 @@ a{color:var(--royal)}
   background:var(--yolk); font:18px var(--sign); color:var(--ink); box-shadow:5px 5px 0 var(--ink); user-select:none; -webkit-user-select:none; touch-action:none}
 #hold .fill{position:absolute; inset:0; width:0; background:var(--gum); mix-blend-mode:multiply}
 #hold span{position:relative}
+#oath .doit{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:11; opacity:0; pointer-events:none}
 #oath .flash{position:absolute; inset:0; background:var(--liver); opacity:0; pointer-events:none; z-index:10; transition:opacity .35s}
 /* "proceed" waits under the typed-out intro; nothing moves on until it's clicked */
 #oath-go{position:absolute; left:50%; bottom:clamp(60px,calc(12*var(--uvh)),140px); translate:-50% 12px; z-index:10; opacity:0; pointer-events:none;
@@ -161,7 +162,7 @@ nav.main .plate-btn{background:var(--gum); color:#fff}
 .searchbox input::placeholder{color:var(--ink); opacity:1}
 
 /* hero: carousel of three full-width banners */
-.hero{position:relative; width:100%; aspect-ratio:1470/620; overflow:hidden; border-bottom:1px solid var(--ink); background:var(--ink)}
+.hero{cursor:var(--hand); position:relative; width:100%; aspect-ratio:1470/620; overflow:hidden; border-bottom:1px solid var(--ink); background:var(--ink)}
 .hero .slide{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.6,0,.25,1); transform:translateX(100%)}
 .hero .slide.on{transform:none}
 .hero-corner{position:absolute; right:0; bottom:0; width:calc(504.8 / 1470 * 100%); z-index:1; pointer-events:none} /* stays put while the banners slide */
@@ -538,6 +539,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
   </div>
   <img class="jaw down" src="assets/lowerjaw.png" alt="">
   <div class="flash"></div>
+  <img class="doit" src="assets/oath-doit.jpg" alt=""> <!-- easter egg: flashes for a split second inside the red strobe (Figma 484:3273) -->
 </section>
 
 <!-- ======================= SHOP ======================= -->
@@ -557,7 +559,7 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 
   <!-- 02 · HOME -->
   <main id="home" class="view">
-    <section class="hero" aria-label="Featured deals" aria-roledescription="carousel">
+    <section class="hero" aria-label="Featured deals" aria-roledescription="carousel" data-go="home" data-scroll="cuts">
       <img class="slide on" src="assets/hero-1.jpg" alt="AMALGAM Shopping Network: plush toys piled into a blue-and-white porcelain teacup.">
       <img class="slide" src="assets/hero-2.jpg" alt="You opened two gifts this morning. They were your eyes! Want more? Sets A to F of eyes for sale.">
       <img class="slide" src="assets/hero-3.jpg" alt="Do you taste that? That sea breeze… Cocktail Partner cans on a beach. Fresh today! Rock-bottom prices!">
@@ -959,11 +961,14 @@ const imgFor = (it, cls="") => it.isYou || it.isPast
     const oathEl = $("#oath"), flash = $(".flash", oathEl);
     oathAmbience(false); oathEl.classList.add("chomp"); sfx.chomp();
     // the jaws slam shut, then the screen strobes red/black before the shop cuts in
-    const beats = [60, 45, 70, 40, 55, 35, 80, 45, 40, 65, 50, 90];
+    const beats = [60, 45, 70, 40, 55, 70, 80, 45, 40, 65, 50, 90];
+    const DOIT = [5, 11]; // these beats show the "do it" eyes instead of black
+    const doit = $(".doit", oathEl);
     let k = 0;
     setTimeout(function flicker(){
       flash.style.transition = "none"; flash.style.opacity = 1;
       flash.style.background = k % 2 ? "#000" : "var(--meat)";
+      doit.style.opacity = DOIT.includes(k) ? 1 : 0;
       if (k < beats.length) setTimeout(flicker, beats[k++]); else showShop();
     }, 150);
   }
@@ -987,8 +992,14 @@ function go(view, arg){
 document.addEventListener("click", e => {
   const g = e.target.closest("[data-go]"); if (!g) return;
   go(g.dataset.go, g.dataset.arg);
-  if (g.dataset.scroll) document.getElementById(g.dataset.scroll)?.scrollIntoView(); // jump straight there, no glide
+  if (g.dataset.scroll) jumpTo(g.dataset.scroll);
 });
+// jump straight to a section (no glide), stopping just below the sticky nav so it doesn't cover the section title
+function jumpTo(id, smooth = false){
+  const el = document.getElementById(id); if (!el) return;
+  el.style.scrollMarginTop = ($("header.top")?.offsetHeight || 0) + 16 + "px";
+  el.scrollIntoView(smooth ? {behavior:"smooth"} : undefined);
+}
 const updateCount = () => $("#plate-count").textContent = plate.length;
 
 /* ============================================================ 02 HOME */
@@ -1952,7 +1963,7 @@ function runVirus(){
       const f = document.createElement("div"); f.className = "final";
       f.innerHTML = `<div>Thank you for your purchase.<br>You are now in stock.<small>returning you to the store…</small></div>`; v.appendChild(f);
       setTimeout(() => { v.hidden = true; $("#confirm-screen").hidden = true; $("#shop").hidden = false; go("home"); renderCustomers();
-        setTimeout(() => document.getElementById("products").scrollIntoView({behavior:"smooth"}), 300); startAnnoyances(); leaveNudge(); }, 3200);
+        setTimeout(() => jumpTo("products", true), 300); startAnnoyances(); leaveNudge(); }, 3200);
     }
   }, 140);
 }
