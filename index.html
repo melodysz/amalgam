@@ -469,7 +469,10 @@ body.gauntlet #bot-tab, body.gauntlet #bot{display:none}
 .field input, .field select, .field textarea{font:17px var(--catalogue); padding:8px; border:2px inset #ccc; background:#fff; width:100%}
 .field .hint{font:11px var(--bot); color:var(--meat)}
 .field.full{grid-column:1/-1}
-.radios{display:flex; gap:12px; flex-wrap:wrap; font:16px var(--catalogue)}
+.radios{display:flex; gap:8px 18px; flex-wrap:wrap; align-items:center; padding-top:4px}
+/* the text-box rule above (.field input = full width + padding) must not stretch the radio buttons */
+.field .radios label{display:inline-flex; align-items:center; gap:6px; font:16px/1.2 var(--catalogue); white-space:nowrap}
+.field .radios input{width:auto; padding:0; margin:0; border:0; accent-color:var(--meat); flex:none}
 .selfie{display:grid; grid-template-columns:160px 1fr; gap:14px; align-items:center}
 .selfie .frame{aspect-ratio:3/4; border:3px solid var(--ink); background:#ddd center/cover; display:grid; place-items:center; font:11px var(--bot); text-align:center; position:relative; overflow:hidden}
 .selfie video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1)}
