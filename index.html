@@ -857,8 +857,8 @@ const cardBody = it => `
   <div class="txt"><h3>${it.name}</h3>${it.blurb ? `<p class="blurb">${it.blurb}</p>` : ""}<div class="tag-price"><span class="w">₩</span>${it.price.toLocaleString("en-US")}</div></div>`;
 const imgFor = (it, cls="") => it.isYou || it.isPast
   ? `<img class="${cls}" src="${it.selfie || it.photo}" alt="${it.isYou ? "You" : it.name}" style="border:4px solid #fff;aspect-ratio:1;object-fit:cover;box-shadow:4px 4px 0 var(--ink)">`
+  : it.tile ? `<img class="${cls}" src="assets/${it.tile}" alt="${it.name}">` // Figma card art first, so the product page + plate match the card
   : it.img ? `<img class="${cls}" src="assets/${it.img}" alt="${it.name}">`
-  : it.tile ? `<img class="${cls}" src="assets/${it.tile}" alt="${it.name}">`
   : `<div class="pend ${it.pend}">${it.pendText || ""}<span class="tapes">PHOTO BEING HARVESTED</span></div>`;
 
 /* ============================================================ 01 OATH */
